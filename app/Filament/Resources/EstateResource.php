@@ -22,6 +22,7 @@ use Filament\Forms\Components\MarkdownEditor;
 use App\Filament\Resources\EstateResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EstateResource\RelationManagers;
+use App\Filament\Resources\EstateResource\RelationManagers\UserRelationManager;
 
 class EstateResource extends Resource
 {
@@ -142,8 +143,9 @@ class EstateResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')->label('#')->sortable(),
-                TextColumn::make('category.title')->label('Estate Type'),
                 TextColumn::make('title')->label('Title')->sortable()->searchable(),
+                TextColumn::make('category.title')->label('Estate Type')->badge()->searchable()
+                ->color('gray'),
                 TextColumn::make('description')->limit(50)->label('Description')->searchable(),
                 TextColumn::make('status')->label('Estate Status')
                     ->badge()
@@ -189,7 +191,7 @@ class EstateResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            UserRelationManager::class ,
         ];
     }
 

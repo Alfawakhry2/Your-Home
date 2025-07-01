@@ -16,8 +16,10 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserResource\RelationManagers;
+use App\Filament\Resources\UserResource\RelationManagers\EstatsRelationManager;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Filters\SelectFilter;
 
 class UserResource extends Resource
 {
@@ -73,7 +75,13 @@ class UserResource extends Resource
                 ImageColumn::make('image')->label('Avatar')->circular(),
             ])
             ->filters([
-                //
+                SelectFilter::make('role')
+                ->label('Role')
+                ->options([
+                    'admin'=>'Admin',
+                    'seller'=>'Seller',
+                    'buyer' => 'Buyer',
+                ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -89,7 +97,7 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            EstatsRelationManager::class,
         ];
     }
 

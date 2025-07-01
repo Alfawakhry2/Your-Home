@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
+use App\Filament\Resources\CategoryResource\RelationManagers\EstatesRelationManager;
 use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
@@ -62,7 +63,7 @@ class CategoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            EstatesRelationManager::class , 
         ];
     }
 
