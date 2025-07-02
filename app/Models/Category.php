@@ -15,7 +15,7 @@ class Category extends Model
 
 
     ##Relationships
-    public function Estates(){
+    public function estates(){
         return $this->hasMany(Estate::class);
     }
 

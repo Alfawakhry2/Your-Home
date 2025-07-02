@@ -3,11 +3,13 @@
 namespace App\Filament\Resources;
 
 use Filament\Forms;
+use App\Models\User;
 use Filament\Tables;
 use App\Models\Estate;
 use App\Models\Category;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
@@ -23,12 +25,15 @@ use App\Filament\Resources\EstateResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EstateResource\RelationManagers;
 use App\Filament\Resources\EstateResource\RelationManagers\UserRelationManager;
+use Filament\Forms\Set;
 
 class EstateResource extends Resource
 {
     protected static ?string $model = Estate::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-home';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static ?string $navigationGroup = 'My Home website';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
@@ -37,8 +42,10 @@ class EstateResource extends Resource
                 Section::make('Basic Information')
                     ->columns(2)
                     ->schema([
-                        Select::make('user_id')
-                            ->relationship('user', 'name')
+                        Select::make('user_id')->label('Owner')
+                            ->options(function () {
+                                return User::where('role', 'seller')->pluck('name', 'id');
+                            })
                             ->searchable()
                             ->preload()
                             ->required(),
@@ -50,6 +57,12 @@ class EstateResource extends Resource
                             ->required(),
 
                         TextInput::make('title')
+                            ->live(onBlur:true)
+                            ->afterStateUpdated(function ($operation, $state,Set $set) {
+                            ## opertaion tell you that in edit or create form
+                                // if($operation === 'edit') return;
+                                $set('slug', Str::slug($state));
+                            })
                             ->required()
                             ->maxLength(50)
                             ->columnSpan(1),
@@ -58,7 +71,8 @@ class EstateResource extends Resource
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(50)
-                            ->columnSpan(1),
+                            ->columnSpan(1)
+                            ->disabled(),
 
                         TextInput::make('price')
                             ->numeric()
@@ -80,17 +94,17 @@ class EstateResource extends Resource
                     ->schema([
                         TextInput::make('bedrooms')
                             ->numeric()
-                            ->minValue(1)
+                            // ->minValue(1)
                             ->required(),
 
                         TextInput::make('bathrooms')
                             ->numeric()
-                            ->minValue(1)
+                            // ->minValue(1)
                             ->required(),
 
                         TextInput::make('area')
                             ->numeric()
-                            ->suffix('sq ft')
+                            ->suffix('Meter')
                             ->required(),
 
                         Select::make('status')
@@ -110,7 +124,6 @@ class EstateResource extends Resource
                             ->directory('estates/main')
                             ->required()
                             ->columnSpan(1),
-
 
                         FileUpload::make('images')
                             ->label('Gallery Images')
@@ -145,7 +158,8 @@ class EstateResource extends Resource
                 TextColumn::make('id')->label('#')->sortable(),
                 TextColumn::make('title')->label('Title')->sortable()->searchable(),
                 TextColumn::make('category.title')->label('Estate Type')->badge()->searchable()
-                ->color('gray'),
+                    ->color('gray'),
+                TextColumn::make('user.name')->label('Owner')->badge()->color('warning'),
                 TextColumn::make('description')->limit(50)->label('Description')->searchable(),
                 TextColumn::make('status')->label('Estate Status')
                     ->badge()
@@ -161,19 +175,19 @@ class EstateResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('status')
-                ->label('Estate Status')
-                ->options(
-                    [
-                        'available' => 'Available',
-                        'sold' => 'Sold',
-                        'rented' => 'Rented',
-                    ]
-                ),
+                    ->label('Estate Status')
+                    ->options(
+                        [
+                            'available' => 'Available',
+                            'sold' => 'Sold',
+                            'rented' => 'Rented',
+                        ]
+                    ),
                 SelectFilter::make('category_id')
                     ->label('Estate Type')
                     ->options(
                         Category::pluck('title', 'id')->toArray(),
-                )
+                    )
 
             ])
             ->actions([
@@ -191,7 +205,7 @@ class EstateResource extends Resource
     public static function getRelations(): array
     {
         return [
-            UserRelationManager::class ,
+            UserRelationManager::class,
         ];
     }
 

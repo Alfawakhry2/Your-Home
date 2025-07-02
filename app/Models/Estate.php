@@ -37,4 +37,12 @@ class Estate extends Model
     public function images(){
         return $this->hasMany(EstateImage::class);
     }
+
+    //make accessors for image
+    public function getImageUrlAttribute(){
+        if(!$this->image){
+            return asset('front/images/default.png');
+        }
+        return asset('storage/'.$this->image);
+    }
 }
