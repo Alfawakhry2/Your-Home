@@ -73,7 +73,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </li>
                             </ul> --}}
                         </li>
-                        <li><a href="services.html">Services</a></li>
+                        @auth
+                        <li><a href="{{ route('cart.index') }}">Interests</a></li>
+                        <li><a href="{{ route('reservation.index') }}">Reservations</a></li>
+                        @endauth
                         @guest
                             <li><a href="{{ route('login') }}">Login</a></li>
                             <li><a href="{{ route('register') }}">Register</a></li>
@@ -103,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="container">
             <div class="row justify-content-center align-items-center">
                 <div class="col-lg-9 text-center mt-5">
-                    <h1 class="heading" data-aos="fade-up">Your Home</h1>
+                    <h1 class="heading fs-1" data-aos="fade-up">Your Home</h1>
 
                     <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="200">
                         <ol class="breadcrumb text-center justify-content-center">

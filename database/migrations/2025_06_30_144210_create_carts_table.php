@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('estate_id')
                 ->constrained('estates')
                 ->cascadeOnDelete();
-                
+
             $table->timestamps();
         });
     }

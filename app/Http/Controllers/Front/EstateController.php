@@ -18,4 +18,5 @@ class EstateController extends Controller
         $estate = Estate::findOrFail($id);
         return view('front.estateDetails', compact('estate'));
     }
+
 }

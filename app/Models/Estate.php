@@ -45,4 +45,8 @@ class Estate extends Model
         }
         return asset('storage/'.$this->image);
     }
+
+    public function cart(){
+        return $this->hasMany(Cart::class);
+    }
 }

@@ -16,7 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('estate_id')->constrained()->cascadeOnDelete();
             $table->date('date');
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->enum('status', ['pending', 'confirmed', 'rejected', 'completed'])->default('pending');
+            $table->enum('payment_status', ['pending','completed'])->default('pending');
             $table->timestamps();
         });
     }

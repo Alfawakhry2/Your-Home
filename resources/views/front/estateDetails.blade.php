@@ -82,7 +82,15 @@
                                 <h4 class="fw-bold mb-3">Description</h4>
                                 <p class="text-secondary lh-lg">{{ $estate->description }}</p>
                             </div>
-
+                            <form action="{{ route('cart.store') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="estate_id" value="{{ $estate->id }}">
+                            <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-secondary w-50 py-2 fw-bold rounded-pill mb-5">
+                                <i class="bi bi-star me-2"></i> Add To Interested List
+                            </button>
+                            </div>
+                            </form>
                             {{-- <div class="property-features mb-5">
                             <h4 class="fw-bold mb-3">المميزات</h4>
                             <div class="row">
