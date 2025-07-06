@@ -14,6 +14,7 @@
         <div class="container">
             <div class="row mb-5 align-items-center">
                 <div class="col-lg-6">
+                    @include('alerts')
                     <h2 class="font-weight-bold text-primary heading">
                         ALL Estates
                     </h2>

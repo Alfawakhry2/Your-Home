@@ -2,22 +2,26 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Widgets\dashboardWidget;
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use App\Filament\Pages\Auth\PasswordReset\ResetPassword;
 use Filament\Pages;
 use Filament\Panel;
+use App\Models\User;
+use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
+use App\Filament\Widgets\dashboardWidget;
+use Filament\Http\Middleware\Authenticate;
+use App\Http\Middleware\AdminAccessControl;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Filament\Http\Middleware\AuthenticateSession;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Filament\Pages\Auth\PasswordReset\RequestPasswordReset;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -28,6 +32,9 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->profile()
+            ->passwordReset()
+            // ->authGuard('filament')
             ->colors([
                 'primary' => Color::Amber,
 
@@ -51,9 +58,9 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-            ])
-            ->authMiddleware([
+            ])->authMiddleware([
                 Authenticate::class,
+                AdminAccessControl::class,
             ]);
     }
 }

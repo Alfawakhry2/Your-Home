@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('estate_id')->constrained()->cascadeOnDelete();
-            $table->date('date');
+            // will add manually by seller after all thing is already good 
+            $table->date('date')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->enum('status', ['pending', 'confirmed', 'rejected', 'completed'])->default('pending');

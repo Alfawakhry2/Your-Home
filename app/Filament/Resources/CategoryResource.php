@@ -10,6 +10,7 @@ use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
@@ -35,10 +36,10 @@ class CategoryResource extends Resource
         return $form
             ->schema([
                 TextInput::make('title')->rules('required|string|min:3|max:50')
-                ->live(onBlur:true)
-                ->afterStateUpdated(function($operation,$state , $set){
-                    $set('slug' , Str::slug($state));
-                }),
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function ($operation, $state, $set) {
+                        $set('slug', Str::slug($state));
+                    }),
                 TextInput::make('slug')->required()->unique(ignoreRecord: true),
                 MarkdownEditor::make('description')->required()->columnSpanFull(),
                 FileUpload::make('image')->rules('required|image|mimes:png,jpg,jpeg,webp')->disk('public')->directory('categories'),
@@ -72,7 +73,7 @@ class CategoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            EstatesRelationManager::class ,
+            EstatesRelationManager::class,
         ];
     }
 
@@ -83,5 +84,35 @@ class CategoryResource extends Resource
             'create' => Pages\CreateCategory::route('/create'),
             'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return auth()->user()->role === 'admin';
+    }
+
+    public static function canForceDeleteAny(): bool
+    {
+        return auth()->user()->role === 'admin';
     }
 }

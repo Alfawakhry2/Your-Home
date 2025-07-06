@@ -3,11 +3,15 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser , MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -50,7 +54,46 @@ class User extends Authenticatable
     }
 
     ## Relationships
-    public function estats(){
+    public function estates()
+    {
         return $this->hasMany(Estate::class);
     }
+
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+
+    // authourization filament and front
+    public function canAccessFilament(): bool
+    {
+        return in_array($this->role, ['admin', 'seller']);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isSeller(): bool
+    {
+        return $this->role === 'seller';
+    }
+
+    public function isBuyer(): bool
+    {
+        return $this->role === 'buyer';
+    }
+
+
+    //after implements the FilamentUser
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return in_array($this->role , ['admin' , 'seller']);
+    }
+
+    
 }
+

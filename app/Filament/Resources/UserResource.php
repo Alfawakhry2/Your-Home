@@ -9,17 +9,19 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Validation\Rule;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Filament\Resources\UserResource\RelationManagers\EstatsRelationManager;
-use Filament\Forms\Components\FileUpload;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Filters\SelectFilter;
 
 class UserResource extends Resource
 {
@@ -113,4 +115,16 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
+
+    public static function canEdit(Model $record): bool
+    {
+        return Auth::user()->role == 'admin';
+    }
+
+    // public static function canViewAny(): bool
+    // {
+    //     return Auth::user()->role == 'admin';
+    // }
+
+
 }
