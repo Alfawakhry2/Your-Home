@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Estate extends Model
@@ -23,6 +24,13 @@ class Estate extends Model
     ];
 
 
+    protected $hidden = [
+        'image'
+    ];
+
+    protected $appends = [
+        'image_url'
+    ];
 
     ## Relationship
     //here we meant the seller
@@ -52,5 +60,21 @@ class Estate extends Model
 
     public function reservations(){
         return $this->hasMany(Reservation::class);
+    }
+
+    public function scopeFilter(Builder $builer , $filters){
+        $options = array_merge([
+            'category_id'=>null ,
+            'user_id' =>null ,
+            'status' =>'available',
+        ] , $filters);
+
+        $builer->when($options['category_id'] , function($builder , $value){
+            $builder->where('category_id', $value);
+        });
+
+        $builer->when($options['user_id'] , function($builder , $value){
+            $builder->where('user_id', $value);
+        });
     }
 }
