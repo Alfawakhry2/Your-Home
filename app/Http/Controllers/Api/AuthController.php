@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -49,14 +50,19 @@ class AuthController extends Controller
             ]);
         }
 
-        // Optional: Check role if needed
-        if ($user->role !== 'buyer') {
-            return response()->json(['message' => 'Not authorized , only buyer'], 403);
-        }
+        ## here we used
+        // if ($user->role !== 'buyer') {
+        //     return response()->json(['message' => 'Not authorized , only buyer'], 403);
+        // }
 
         $token = $user->createToken('api_token')->plainTextToken;
 
-        return response()->json(['token' => $token, 'user' => $user]);
+        return response()->json(
+            [
+                'token' => $token,
+                'user' => $user
+            ]
+        );
     }
 
     public function logout(Request $request)

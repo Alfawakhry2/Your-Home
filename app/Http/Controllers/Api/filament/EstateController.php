@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\filament;
 
 use App\Models\Estate;
 use Illuminate\Support\Str;
@@ -11,12 +11,21 @@ use Illuminate\Support\Facades\Validator;
 
 class EstateController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Estate::class, 'estate');
+    }
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $estates = Estate::with('reservations', 'images')->filter($request->query())->paginate(6);
+        if ($request->user()->role === 'admin') {
+            $estates = Estate::with('reservations', 'images')->filter($request->query())->paginate(6);
+        } else {
+            $estates = $request->user()->estates;
+        }
         return EstateResource::collection($estates);
     }
 

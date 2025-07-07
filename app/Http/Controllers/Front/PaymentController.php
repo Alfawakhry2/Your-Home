@@ -57,7 +57,7 @@ class PaymentController extends Controller
         $reservation = Reservation::find($reservationId);
         if (! $reservation) {
             return redirect()->route('estates.index')
-                ->with('error', 'الحجز غير موجود');
+                ->with('error', 'Reservation Not Exist !');
         }
 
         if ($request->query('success') == 'true' || $request->query('success') === true) {
@@ -72,7 +72,7 @@ class PaymentController extends Controller
         $reservation->save();
 
         return redirect()->route('reservation.index')
-            ->with('success', 'تم الدفع بنجاح!');
+            ->with('success', 'Paied Successfully ');
     }
 
     //  Callback

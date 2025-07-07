@@ -66,7 +66,7 @@ class Estate extends Model
         $options = array_merge([
             'category_id'=>null ,
             'user_id' =>null ,
-            'status' =>'available',
+            'status' =>null,
         ] , $filters);
 
         $builer->when($options['category_id'] , function($builder , $value){
