@@ -51,7 +51,6 @@ class PaymentController extends Controller
 
     public function response(Request $request)
     {
-        // البيانات بتيجي كـ query params: success, merchant_order_id, transaction_id, etc.
         $merchantOrderId = $request->query('merchant_order_id');
         [$reservationId] = explode('_', $merchantOrderId);
 
@@ -61,7 +60,6 @@ class PaymentController extends Controller
                 ->with('error', 'الحجز غير موجود');
         }
 
-        // حدّد الحالة
         if ($request->query('success') == 'true' || $request->query('success') === true) {
             $reservation->status         = 'confirmed';
             $reservation->payment_status = 'paid';
@@ -70,19 +68,16 @@ class PaymentController extends Controller
             $reservation->payment_status = 'pending';
         }
 
-        // خزن بقية التفاصيل
         $reservation->payment_details = json_encode($request->all());
         $reservation->save();
 
-        // رجّع المستخدم لصفحة الحجز أو أي صفحة شكر
         return redirect()->route('reservation.index')
             ->with('success', 'تم الدفع بنجاح!');
     }
 
-    // 4) Callback
+    //  Callback
     public function callback(Request $request)
     {
-        // فكّر في التحقق الأمني (HMAC أو IP whitelist)
         $merchantOrderId = $request->input('merchant_order_id');
         [$reservationId]  = explode('_', $merchantOrderId);
 

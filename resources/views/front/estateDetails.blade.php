@@ -93,7 +93,7 @@
                                 </div>
                             </form>
                             {{-- <div class="property-features mb-5">
-                            <h4 class="fw-bold mb-3">المميزات</h4>
+                            <h4 class="fw-bold mb-3"></h4>
                             <div class="row">
                                 @foreach ($estate->features as $feature)
                                 <div class="col-md-6 mb-2">

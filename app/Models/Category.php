@@ -13,11 +13,17 @@ class Category extends Model
         'image',
     ];
 
+    // this use only when json 
+    protected $hidden = [
+        'created_at' , 'updated_at'
+    ];
 
     ##Relationships
     public function estates(){
         return $this->hasMany(Estate::class);
     }
+
+
 
 
 }

@@ -18,7 +18,7 @@ Auth::routes(['verify' => true]);
 
 // RedirectIfFilamentUser can allow to guest or buyer , and only admin , seller can not access to these page
 Route::middleware(RedirectIfFilamentUser::class)->group(function () {
-    // بعدين: مسارات عامة (public) بدون أي redirect
+
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('estate/category/{id}', [CategoryController::class, 'categoryEstates'])->name('category.estates');
     Route::get('estates', [EstateController::class, 'index'])->name('estates.index');
@@ -37,19 +37,19 @@ Route::middleware([RedirectIfNotBuyer::class, 'auth', 'verified'])
         // Route::post('checkout/estate/{id}/pay', [CheckoutController::class, 'store'])->name('checkout.pay');
         // Route::get('pay/{reservation}', [PaymentController::class, 'pay'])->name('paymob.pay');
         // Route::post('paymob/callback', [PaymentController::class, 'callback'])->name('paymob.callback');
-        // 1) صفحة الشيك آوت: يشوف تفاصيل العقار ويختار التأكيد
+
         Route::get('checkout/estate/{id}', [CheckoutController::class, 'checkout'])
             ->name('checkout.estate');
 
-        // 2) بعد الضغط تأكيد الشيك آوت: نسجل الحجز ونحوّل للدفع
+
         Route::post('checkout/estate/{id}/pay', [CheckoutController::class, 'store'])
             ->name('checkout.pay');
 
-        // 3) صفحة الدفع عند Paymob (بعد ما سجلنا الحجز)
+
         Route::get('pay/{reservation}', [PaymentController::class, 'pay'])
             ->name('paymob.pay');
 
-        // 4) Callback من Paymob بعد إتمام/فشل الدفع
+
         Route::post('paymob/callback', [PaymentController::class, 'callback'])
             ->name('paymob.callback');
 

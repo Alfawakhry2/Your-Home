@@ -27,7 +27,6 @@ class PaymobService
         $this->iframeUrl     = config('paymob.iframe_url');
     }
 
-    // 1) جلب توكن التصديق
     public function authToken(): string
     {
         $response = Http::post($this->authUrl, [
@@ -42,10 +41,9 @@ class PaymobService
         return $response->json()['token'];
     }
 
-    // 2) إنشاء Order مع merchant_order_id فريد ومعالجة duplicate
     public function createOrder(int $amountCents, int|string $merchantOrderId): int|string
     {
-        // نضيف suffix timestamp عشان يكون فريد
+
         $uniqueMerchantId = $merchantOrderId . '_' . now()->timestamp;
 
         $token = $this->authToken();
@@ -59,13 +57,12 @@ class PaymobService
 
         $data = $response->json();
         Log::info('Paymob createOrder response', $data);
-        // لو فشل الطلب لأي سبب غير duplicate
+
         if (! $response->successful() && ($data['message'] ?? '') !== 'duplicate') {
             Log::error('Paymob createOrder error', $data);
             throw new Exception('Paymob order creation failed');
         }
 
-        // الحصول على order ID من JSON
         if (isset($data['order']['id'])) {
             return $data['order']['id'];
         }
@@ -77,7 +74,7 @@ class PaymobService
         throw new Exception('Paymob order ID not found in response');
     }
 
-    // 3) توليد payment key
+    //payment key
     public function paymentKey(int $amountCents, int|string $orderId, array $billingData = []): string
     {
         $token = $this->authToken();
