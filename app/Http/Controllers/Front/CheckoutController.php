@@ -2,15 +2,24 @@
 
 namespace App\Http\Controllers\front;
 
+use Carbon\Carbon;
 use App\Models\Estate;
 use App\Models\Reservation;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Repo\Cart\CartModel;
+use Illuminate\Http\Request;
+use App\Services\PaymobService;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
+    protected $paymob;
+
+    public function __construct(PaymobService $paymob)
+    {
+        $this->paymob = $paymob;
+    }
+
     public function checkout($id)
     {
         $estate = Estate::findOrFail($id);
@@ -20,37 +29,43 @@ class CheckoutController extends Controller
         return view('front.checkout', compact('estate'));
     }
 
-
-    public function store(Request $request, Estate $estate)
+    public function store(Request $request, $id)
     {
-        $estate = Estate::findOrFail($request->post('estate_id'));
+
+        $estate = Estate::findOrFail($id);
         if ($estate->status !== 'available') {
-            return redirect()->route('estates.index')->with('error', 'This Estate Already Reserved');
+            return redirect()->route('estates.index')
+                ->with('error', 'This Estate Already Reserved');
         }
 
+        $rules = [];
         if ($estate->type == 'rent') {
-            $request->validate([
+            $rules = [
                 'start_date' => 'required|date|after_or_equal:today',
-                'end_date' => 'required|date|after:start_date',
-            ]);
-
-            $reservation = Reservation::create([
-                'user_id' =>Auth::id(),
-                'estate_id' => $estate->id,
-                'date' => now(),
-                'start_date' => $estate->type === 'rent' ? $request->start_date : null,
-                'end_date' => $estate->type === 'rent' ? $request->end_date : null,
-            ]);
-
-            if($reservation){
-                $estate->status = $estate->type === 'rent' ? 'rented' : 'sold';
-                $estate->save();
-
-                $cart = new CartModel();
-                $cart->delete($reservation->id);
-            }
-
-            return redirect()->route('estates.index')->with('success' , 'Estate Is Reserved Successsfully');
+                'duration'   => 'required|numeric|min:1|max:12',
+            ];
         }
+        $request->validate($rules);
+
+        $startDate =  $estate->type === 'rent' ? Carbon::parse($request->start_date) : null;
+        $endDate = $startDate ? $startDate->copy()->addMonths( (int) $request->duration) : null;
+        $reservation = Reservation::create([
+            'user_id'    => Auth::id(),
+            'estate_id'  => $estate->id,
+            'date'       => now(),
+            'start_date' => $startDate,
+            'end_date'   =>$endDate,
+            'price' => $estate->price,
+            'status'     => 'pending',
+        ]);
+
+        $estate->status = $estate->type === 'rent' ? 'rented' : 'sold';
+        $estate->save();
+
+
+        $cart = new CartModel();
+        $cart->delete($reservation->id);
+
+        return redirect()->route('paymob.pay', $reservation->id);
     }
 }

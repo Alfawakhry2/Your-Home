@@ -3,77 +3,117 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class PaymobService
 {
     protected $apiKey;
     protected $integrationId;
     protected $iframeId;
+    protected $authUrl;
+    protected $orderUrl;
+    protected $paymentKeyUrl;
+    protected $iframeUrl;
 
     public function __construct()
     {
-        $this->apiKey = config('services.paymob.api_key');
-        $this->integrationId = config('services.paymob.integration_id');
-        $this->iframeId = config('services.paymob.iframe_id');
+        $this->apiKey        = config('paymob.api_key');
+        $this->integrationId = config('paymob.integration_id');
+        $this->iframeId      = config('paymob.iframe_id');
+        $this->authUrl       = config('paymob.auth_url');
+        $this->orderUrl      = config('paymob.order_url');
+        $this->paymentKeyUrl = config('paymob.payment_key_url');
+        $this->iframeUrl     = config('paymob.iframe_url');
     }
 
-    // 1. Get auth token
-    public function authenticate()
+    // 1) جلب توكن التصديق
+    public function authToken(): string
     {
-        $response = Http::post('https://accept.paymob.com/api/auth/tokens', [
+        $response = Http::post($this->authUrl, [
             'api_key' => $this->apiKey,
         ]);
 
-        return $response['token'];
+        if (! $response->successful()) {
+            Log::error('Paymob authToken failed', $response->json());
+            throw new Exception('Failed to authenticate with Paymob');
+        }
+
+        return $response->json()['token'];
     }
 
-    // 2. Create order
-    public function createOrder($token, $amount, $user)
+    // 2) إنشاء Order مع merchant_order_id فريد ومعالجة duplicate
+    public function createOrder(int $amountCents, int|string $merchantOrderId): int|string
     {
-        $response = Http::post('https://accept.paymob.com/api/ecommerce/orders', [
-            'auth_token' => $token,
-            'delivery_needed' => false,
-            'amount_cents' => $amount * 100,
-            'currency' => 'EGP',
-            'items' => [],
-        ]);
+        // نضيف suffix timestamp عشان يكون فريد
+        $uniqueMerchantId = $merchantOrderId . '_' . now()->timestamp;
 
-        return $response['id'];
+        $token = $this->authToken();
+        $response = Http::withToken($token)
+            ->post($this->orderUrl, [
+                'amount_cents'      => $amountCents,
+                'currency'          => 'EGP',
+                'merchant_order_id' => $uniqueMerchantId,
+
+            ]);
+
+        $data = $response->json();
+        Log::info('Paymob createOrder response', $data);
+        // لو فشل الطلب لأي سبب غير duplicate
+        if (! $response->successful() && ($data['message'] ?? '') !== 'duplicate') {
+            Log::error('Paymob createOrder error', $data);
+            throw new Exception('Paymob order creation failed');
+        }
+
+        // الحصول على order ID من JSON
+        if (isset($data['order']['id'])) {
+            return $data['order']['id'];
+        }
+
+        if (isset($data['id'])) {
+            return $data['id'];
+        }
+
+        throw new Exception('Paymob order ID not found in response');
     }
 
-    // 3. Get payment key
-    public function getPaymentKey($token, $amount, $orderId, $user)
+    // 3) توليد payment key
+    public function paymentKey(int $amountCents, int|string $orderId, array $billingData = []): string
     {
-        $billingData = [
-            "first_name" => $user->name,
-            "last_name" => "user",
-            "email" => $user->email,
-            "phone_number" => "01000000000",
-            "apartment" => "NA",
-            "floor" => "NA",
-            "street" => "NA",
-            "building" => "NA",
-            "city" => "Cairo",
-            "country" => "EG",
-            "state" => "Cairo",
-        ];
+        $token = $this->authToken();
+        $response = Http::withToken($token)
+            ->post($this->paymentKeyUrl, [
+                'amount_cents'   => $amountCents,
+                'expiration'     => 3600,
+                'order_id'       => $orderId,
+                'integration_id' => $this->integrationId,
+                'currency' => 'EGP',
+                'billing_data'   => $billingData,
+            ]);
 
-        $response = Http::post('https://accept.paymob.com/api/acceptance/payment_keys', [
-            'auth_token' => $token,
-            'amount_cents' => $amount * 100,
-            'expiration' => 3600,
-            'order_id' => $orderId,
-            'billing_data' => $billingData,
-            'currency' => 'EGP',
-            'integration_id' => $this->integrationId,
-        ]);
+        // dd([
+        //     'status_code' => $response->status(),
+        //     'body'        => $response->json(),
+        // ]);
+        if (! $response->successful()) {
+            Log::error('Paymob paymentKey failed', $response->json());
+            throw new Exception('Failed to generate payment key');
+        }
 
-        return $response['token'];
+        return $response->json()['token'];
     }
 
-    // 4. Get iframe URL
-    public function getIframeUrl($paymentToken)
+
+    public function getPaymentIframeUrl(string $paymentKey): string
     {
-        return "https://accept.paymob.com/api/acceptance/iframes/{$this->iframeId}?payment_token={$paymentToken}";
+        return "{$this->iframeUrl}?payment_token={$paymentKey}";
+    }
+
+    public function verifyHmac($data, $hmac)
+    {
+        ksort($data);
+        $queryString = http_build_query($data);
+        $calculatedHmac = hash_hmac('sha512', $queryString, config('paymob.hmac_key'));
+        return $hmac === $calculatedHmac;
     }
 }

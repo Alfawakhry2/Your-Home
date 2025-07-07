@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\front;
 
-use App\Http\Controllers\Controller;
+use App\Models\Reservation;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
     public function index(){
-        
-        return view('front.resevation');
+        $reservations = Reservation::with('estate' , 'user')->where('user_id' , Auth::id())->get();
+        return view('front.resevation', compact('reservations'));
     }
+
+
 }

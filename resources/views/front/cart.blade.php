@@ -20,7 +20,9 @@
                     <form action="{{ route('cart.empty') }}" method="POST">
                         @csrf
                         @method('delete')
+                        @if($cart->count() > 0)
                         <button type="submit" class="btn btn-danger">Delete All From List</button>
+                        @endif
                     </form>
                 </div>
                 <div class="card-body">

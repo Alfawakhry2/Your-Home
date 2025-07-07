@@ -11,16 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reservations', function (Blueprint $table) {
+Schema::create('reservations', function (Blueprint $table) {
             $table->id();
+
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('estate_id')->constrained()->cascadeOnDelete();
-            // will add manually by seller after all thing is already good 
-            $table->date('date')->nullable();
+
+            $table->dateTime('date')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->enum('status', ['pending', 'confirmed', 'rejected', 'completed'])->default('pending');
-            $table->enum('payment_status', ['pending','completed'])->default('pending');
+
+            $table->decimal('price', 10, 2);
+
+
+            $table->enum('status', ['pending', 'confirmed'])->default('pending');
+            $table->enum('payment_status', ['unpaid', 'paid','pending'])->default('pending');
+
+            $table->json('payment_details')->nullable();
+
             $table->timestamps();
         });
     }

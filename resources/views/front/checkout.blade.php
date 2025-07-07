@@ -115,11 +115,11 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label for="end_date" class="form-label fw-bold">
-                                                <i class="bi bi-calendar-x me-2"></i>End Date
+                                                <i class="bi bi-calendar-x me-2"></i>Duration(Month)
                                             </label>
-                                            <input type="date" name="end_date" id="end_date"
+                                            <input type="number" name="duration" id="duration" min="1" max="12"
                                                 class="form-control form-control-lg">
-                                            @error('end_date')
+                                            @error('duration')
                                                 <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -132,28 +132,22 @@
                                     </label>
                                     <div class="payment-methods">
                                         <div class="row g-3">
+                                            {{-- <div class="col-md-4">
+                                                <input type="radio" name="payment_method" id="vodafone-cash"
+                                                    class="d-none">
+                                                <label for="vodafone-cash" class="payment-method-card">
+                                                    <i class="bi bi-phone"></i>
+                                                    <span>Vodafone Cach</span>
+                                                </label>
+                                            </div> --}}
                                             <div class="col-md-4">
-                                                <input type="radio" name="payment_method" id="credit-card" class="d-none"
-                                                    checked>
-                                                <label for="credit-card" class="payment-method-card">
-                                                    <i class="bi bi-credit-card-2-front"></i>
-                                                    <span>Cach On Deliver</span>
+                                                <input type="radio" name="payment_method" id="bank-transfer"
+                                                    class="d-none">
+                                                <label for="bank-transfer" class="payment-method-card">
+                                                    <i class="bi bi-bank"></i>
+                                                    <span>Bank Transfer</span>
                                                 </label>
                                             </div>
-                                            {{-- <div class="col-md-4">
-                                            <input type="radio" name="payment_method" id="vodafone-cash" class="d-none">
-                                            <label for="vodafone-cash" class="payment-method-card">
-                                                <i class="bi bi-phone"></i>
-                                                <span>Vodafone Cach</span>
-                                            </label>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="radio" name="payment_method" id="bank-transfer" class="d-none">
-                                            <label for="bank-transfer" class="payment-method-card">
-                                                <i class="bi bi-bank"></i>
-                                                <span>Bank Transfer</span>
-                                            </label>
-                                        </div> --}}
                                         </div>
                                     </div>
                                 </div>
