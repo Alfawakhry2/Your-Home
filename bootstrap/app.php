@@ -18,13 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append([
-            \App\Http\Middleware\SendWelcomeEmailAfterVerification::class,
         ]);
 
         $middleware->alias([
             'role' => CheckRole::class,
             'not.filament' => NotFilamentUser::class,
-            // 'sendWelcomeEmail' => SendWelcomeEmailAfterVerification::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
