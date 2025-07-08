@@ -96,9 +96,6 @@
                                         <button type="submit" class="btn btn-primary flex-grow-1 py-2" title="Apply Filters">
                                             <i class="bi bi-funnel-fill"></i> Apply Filter
                                         </button>
-                                        <a href="#" class="btn btn-outline-secondary py-2" title="Reset">
-                                            <i class="bi bi-arrow-counterclockwise"></i>
-                                        </a>
                                     </div>
                                 </div>
                             </div>
