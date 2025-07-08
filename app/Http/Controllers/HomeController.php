@@ -22,7 +22,9 @@ class HomeController extends Controller
             return redirect('/email/verify');
         }
         $categories = Category::all();
-        $estates = Estate::where('status' , 'available')->latest()->take(3)->get();
-        return view('front.index' , compact('categories' , 'estates'));
+        $estates = Estate::where('status' , 'available')->latest()->take(6)->get();
+
+        $locations = Estate::pluck('location');
+        return view('front.index' , compact('categories' , 'estates' , 'locations'));
     }
 }

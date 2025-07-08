@@ -7,15 +7,15 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
-       // List all users (admin only)
+    // List all users (admin only)
     public function index()
     {
-        $this->authorize('viewAny', User::class);
-
-        return UserResource::collection(User::paginate(10));
+        $users = User::paginate(10);
+        return UserResource::collection($users);
     }
 
     // Create new user (admin only)
@@ -27,9 +27,9 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'nullable|string|unique:users',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', 'min:8'],
             'role' => 'required|in:admin,seller,buyer',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|max:1024',
         ]);
 
         $user = User::create([
@@ -42,7 +42,7 @@ class UserController extends Controller
 
         if ($request->hasFile('image')) {
             $user->update([
-                'image' => $request->file('image')->store('user-images')
+                'image' => $request->file('image')->store('users')
             ]);
         }
 
@@ -63,9 +63,9 @@ class UserController extends Controller
 
         $request->validate([
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,'.$user->id,
-            'phone' => 'sometimes|nullable|string|unique:users,phone,'.$user->id,
-            'password' => ['sometimes', 'confirmed', Rules\Password::defaults()],
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
+            'phone' => 'sometimes|nullable|string|unique:users,phone,' . $user->id,
+            'password' => ['sometimes', 'required', 'confirmed', 'min:8'],
             'role' => 'sometimes|in:admin,seller,buyer',
             'image' => 'sometimes|image|max:2048',
         ]);
@@ -80,18 +80,33 @@ class UserController extends Controller
 
         if ($request->hasFile('image')) {
             $user->update([
-                'image' => $request->file('image')->store('user-images')
+                'image' => $request->file('image')->store('users')
             ]);
         }
 
-        return new UserResource($user);
+        return response()->json([
+            'message' => 'User Updated',
+            'data' => new UserResource($user),
+        ]);
     }
 
     // Delete user (admin only)
-    public function destroy(User $user)
+    public function destroy($id)
     {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found'
+            ], 404);
+        }
+
         $this->authorize('delete', $user);
+
         $user->delete();
-        return response()->noContent();
+
+        return response()->json([
+            'message' => 'User deleted',
+        ]);
     }
 }

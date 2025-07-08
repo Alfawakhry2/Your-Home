@@ -5,18 +5,19 @@
 
 @section('breadcrumb')
     @parent
-    <li class="breadcrumb-item"><a href="index.html">Main Page</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('home') }}">Main Page</a></li>
 @endsection
 
 
 
 @section('content')
+@include('front.filter')
     <div class="section">
         <div class="container">
             <div class="row mb-5 align-items-center">
                 <div class="">
                     <h2 class="font-weight-bold text-primary heading text-center">
-                        Our Real Estate Types
+                        Our Real Estate Category
                     </h2>
                 </div>
             </div>
@@ -48,8 +49,7 @@
                                             <!-- Push the button to bottom -->
                                             <div class="mt-auto">
                                                 <a href="{{ route('category.estates', $category->id) }}"
-                                                    class="btn btn-primary py-2 px-3 w-100">See
-                                                    details</a>
+                                                    class="btn btn-primary py-2 px-3 w-100">View Related Real Estate</a>
                                             </div>
                                         </div>
                                     </div>
@@ -75,13 +75,13 @@
             <div class="row mb-5 align-items-center">
                 <div class="col-lg-6">
                     <h2 class="font-weight-bold text-primary heading">
-                        Recent Estates
+                        Recent Real Estates
                     </h2>
                 </div>
                 <div class="col-lg-6 text-lg-end">
                     <p>
-                        <a href="{{ route('estates.index') }}" class="btn btn-primary text-white py-3 px-4">View all
-                            properties</a>
+                        <a href="{{ route('estates.index') }}" class="btn btn-primary text-white py-3 px-4">View More
+                            Real Estate</a>
                     </p>
                 </div>
             </div>
@@ -148,18 +148,7 @@
                 @endforeach
 
             </div>
-            <div class="row align-items-center py-5">
-                <div class="col-lg-3">Pagination (1 of 10)</div>
-                <div class="col-lg-6 text-center">
-                    <div class="custom-pagination">
-                        <a href="#">1</a>
-                        <a href="#" class="active">2</a>
-                        <a href="#">3</a>
-                        <a href="#">4</a>
-                        <a href="#">5</a>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </div>
     {{-- </section> --}}

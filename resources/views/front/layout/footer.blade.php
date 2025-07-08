@@ -33,11 +33,10 @@
                         <script>
                             document.write(new Date().getFullYear());
                         </script>
-                        . All Rights Reserved &mdash; Designed with love by
-                        My Home
+                        . All Rights Reserved
                     </p>
                     <div>
-                        Distributed by
+
                         <a href="https://github.com/Alfawakhry2" class="text-decoration-none fw-bold " target="_blank">Eng/Ahmed Alfawakhry </a>
                     </div>
                 </div>

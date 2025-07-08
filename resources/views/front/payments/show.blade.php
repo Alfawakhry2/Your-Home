@@ -14,7 +14,7 @@
 
         @if($details)
             <ul class="list-group mb-4">
-                <li class="list-group-item">Price : {{ ($details['amount_cents'] ?? 0) / 100 }} EGP</li>
+                <li class="list-group-item">Price : {{number_format(($details['amount_cents'] ?? 0) / 100) }} EGP</li>
                 <li class="list-group-item">Currency: {{ $details['currency'] ?? '-' }}</li>
                 <li class="list-group-item">Card: {{ $details['card_type'] ?? '' }} ****{{ $details['card_ending'] ?? '' }}</li>
                 <li class="list-group-item"> Transaction Number : {{ $details['transaction_id'] ?? ($details['id'] ?? '-') }}</li>

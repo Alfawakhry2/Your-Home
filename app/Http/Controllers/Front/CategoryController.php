@@ -17,6 +17,7 @@ class CategoryController extends Controller
             return redirect('/email/verify');
         }
         $category = Category::with('estates')->findOrFail($id);
-        return view('front.estatesCategory', compact('category'));
+        $estates =  Estate::where('category_id' , $category->id)->paginate(6);
+        return view('front.estatesCategory', compact( 'category', 'estates'));
     }
 }

@@ -2,9 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\NotFilamentUser;
 use App\Http\Controllers\Api\AuthController;
-
 use App\Http\Controllers\Api\front\CartController;
 use App\Http\Controllers\Api\front\EstateController;
 use App\Http\Controllers\Api\front\CategoryController;
@@ -67,7 +65,7 @@ Route::controller(CheckoutController::class)->group(function () {
 Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
 
     //for User
-    Route::apiResource('users', UserController::class)->middleware('role:admin');
+    Route::apiResource('users', UserController::class)->middleware('role:admin,seller');
 
     ## Category
     Route::controller(FilamentCategoryController::class)->group(function () {

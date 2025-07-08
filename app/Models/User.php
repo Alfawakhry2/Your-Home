@@ -12,10 +12,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements FilamentUser , MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable , HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -39,8 +39,13 @@ class User extends Authenticatable implements FilamentUser , MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        'image',
     ];
 
+    protected $appends =[
+        'image_url'
+    ];
+    
     /**
      * Get the attributes that should be cast.
      *
@@ -92,9 +97,15 @@ class User extends Authenticatable implements FilamentUser , MustVerifyEmail
     //after implements the FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
-        return in_array($this->role , ['admin' , 'seller']);
+        return in_array($this->role, ['admin', 'seller']);
     }
 
 
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return asset('front/images/default.png');
+        }
+        return asset('storage/' . $this->image);
+    }
 }
-

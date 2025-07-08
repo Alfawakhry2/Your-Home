@@ -4,12 +4,12 @@
 
 @section('breadcrumb')
     @parent
-    <li class="breadcrumb-item"><a href="index.html">ALL Estates</a></li>
+    <li class="breadcrumb-item"><a href="{{ url()->current() }}">Estates</a></li>
 @endsection
 
 
 @section('content')
-
+@include('front.filter')
     <div class="section section-properties">
         <div class="container">
             <div class="row mb-5 align-items-center">
@@ -86,6 +86,7 @@
             </div>
 
         </div>
+        {{ $estates->withQueryString()->links('customPaginate') }}
     </div>
 
 @endsection

@@ -4,8 +4,8 @@
 
 @section('breadcrumb')
     @parent
-    <li class="breadcrumb-item"><a href="index.html">Estats</a></li>
-    <li class="breadcrumb-item"><a href="index.html">{{ $estate->title }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url()->previous() }}">Estats</a></li>
+    <li class="breadcrumb-item"><a href="{{ url()->current() }}">{{ $estate->title }}</a></li>
 @endsection
 
 

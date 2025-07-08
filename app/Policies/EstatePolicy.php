@@ -13,7 +13,7 @@ class EstatePolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,14 +21,14 @@ class EstatePolicy
      */
     public function view(User $user, Estate $estate): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can create models.
      */
     public function create(User $user): bool {
-        return false ; 
+        return true ;
     }
 
     /**

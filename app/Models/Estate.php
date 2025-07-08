@@ -62,6 +62,7 @@ class Estate extends Model
         return $this->hasMany(Reservation::class);
     }
 
+    // this used with api
     public function scopeFilter(Builder $builer , $filters){
         $options = array_merge([
             'category_id'=>null ,
@@ -76,5 +77,75 @@ class Estate extends Model
         $builer->when($options['user_id'] , function($builder , $value){
             $builder->where('user_id', $value);
         });
+    }
+
+
+    //Filter
+
+
+    /**
+     * Filter by location (city/area)
+     */
+    public function scopeLocation(Builder $query,  $location)
+    {
+        if ($location) {
+            return $query->where('location', 'like', "%{$location}%");
+        }
+        return $query;
+    }
+
+    /**
+     * Filter by category ID
+     */
+    public function scopeCategory(Builder $query,  $categoryId)
+    {
+        if ($categoryId) {
+            return $query->where('category_id', $categoryId);
+        }
+        return $query;
+    }
+
+    /**
+     * Filter by status (available/rented/sold)
+     */
+    public function scopeStatus(Builder $query,  $status)
+    {
+        if ($status) {
+            return $query->where('status', $status);
+        }
+        return $query;
+    }
+
+    /**
+     * Filter by type (rent/sale)
+     */
+    public function scopeType(Builder $query,  $type)
+    {
+        if ($type) {
+            return $query->where('type', $type);
+        }
+        return $query;
+    }
+
+    /**
+     * Filter by minimum bedrooms
+     */
+    public function scopeBedrooms(Builder $query,  $bedrooms)
+    {
+        if ($bedrooms) {
+            return $query->where('bedrooms', '>=', $bedrooms);
+        }
+        return $query;
+    }
+
+    /**
+     * Filter by minimum bathrooms
+     */
+    public function scopeBathrooms(Builder $query,  $bathrooms)
+    {
+        if ($bathrooms) {
+            return $query->where('bathrooms', '>=', $bathrooms);
+        }
+        return $query;
     }
 }

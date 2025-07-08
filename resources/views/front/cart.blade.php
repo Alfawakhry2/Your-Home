@@ -4,7 +4,7 @@
 
 @section('breadcrumb')
     @parent
-    <li class="breadcrumb-item"><a href="{{ route('cart.index') }}">Interest List</a></li>
+    <li class="breadcrumb-item"><a href="{{ url()->current() }}">Interest List</a></li>
 @endsection
 
 

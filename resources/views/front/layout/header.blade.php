@@ -27,6 +27,80 @@
     <link rel="stylesheet" href="{{asset('css/filament/filament/app.css')}}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('front/css/style.css') }}" />
+
+<style>
+    .site-nav {
+        background-color: #2c3e50;
+        padding: 15px 0;
+    }
+
+    .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
+    }
+
+    .dropdown-toggle:hover {
+        color: #f8f9fa;
+    }
+
+    .dropdown-menu {
+        border: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        padding: 10px 0;
+    }
+
+    .dropdown-item {
+        padding: 8px 20px;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+        color: #2c3e50;
+    }
+
+    .dropdown-divider {
+        margin: 5px 0;
+    }
+
+    .site-menu > li {
+        display: inline-block;
+        position: relative;
+    }
+
+    .site-menu > li > a {
+        color: white;
+        padding: 8px 15px;
+        display: inline-block;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    .site-menu > li > a:hover {
+        color: #f8f9fa;
+    }
+
+    .active > a {
+        font-weight: bold;
+        color: #fff !important;
+        position: relative;
+    }
+
+    .active > a:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 15px;
+        right: 15px;
+        height: 2px;
+        background-color: #fff;
+    }
+</style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Bootstrap CSS loaded:', !!document.querySelector('link[href*="bootstrap"]'));
@@ -50,57 +124,53 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="site-mobile-menu-body"></div>
     </div>
 
-    <nav class="site-nav">
-        <div class="container">
-            <div class="menu-bg-wrap">
-                <div class="site-navigation">
-                    <a href="{{ route('home') }}" class="logo m-0 float-start fs-2 text-white">Your Home</a>
+<nav class="site-nav">
+    <div class="container">
+        <div class="menu-bg-wrap">
+            <div class="site-navigation">
+                <a href="{{ route('home') }}" class="logo m-0 float-start fs-2 text-white">Your Home</a>
 
-                    <ul class="js-clone-nav d-none d-lg-inline-block text-start site-menu float-end">
-                        <li class="{{ request()->routeIs('home') ? 'active' : '' }}"><a href="{{ route('home') }}">Home</a></li>
-                        <li class="{{ request()->routeIs('estates.index') ? 'active' : '' }}">
-                            <a  href="{{ route('estates.index') }}">Estates</a>
-                            {{-- <ul class="dropdown">
-                                <li><a href="#">Buy Property</a></li>
-                                <li><a href="#">Sell Property</a></li>
-                                <li class="has-children">
-                                    <a href="#">Dropdown</a>
-                                    <ul class="dropdown">
-                                        <li><a href="#">Sub Menu One</a></li>
-                                        <li><a href="#">Sub Menu Two</a></li>
-                                        <li><a href="#">Sub Menu Three</a></li>
-                                    </ul>
+                <ul class="js-clone-nav d-none d-lg-inline-block text-start site-menu float-end">
+                    <li class="{{ request()->routeIs('home') ? 'active' : '' }}"><a href="{{ route('home') }}">Home</a></li>
+                    <li class="{{ request()->routeIs('estates.index') ? 'active' : '' }}">
+                        <a href="{{ route('estates.index') }}">Estates</a>
+                    </li>
+                    @auth
+                    <li class="{{ request()->routeIs('cart.index') ? 'active' : ''}}"><a href="{{ route('cart.index') }}">Interests</a></li>
+                    <li class="{{ request()->routeIs('reservation.index') ? 'active' : ''}}"><a href="{{ route('reservation.index') }}">Reservations</a></li>
+                    @endauth
+
+                    @guest
+                        <li><a href="{{ route('login') }}">Login</a></li>
+                        <li><a href="{{ route('register') }}">Register</a></li>
+                    @endguest
+
+                    @auth
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i> {{ Auth::user()->name }}</a></li>
+                                {{-- <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i> Settings</a></li> --}}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ route('logout') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                        </button>
+                                    </form>
                                 </li>
-                            </ul> --}}
+                            </ul>
                         </li>
-                        @auth
-                        <li><a href="{{ route('cart.index') }}">Interests</a></li>
-                        <li><a href="{{ route('reservation.index') }}">Reservations</a></li>
-                        @endauth
-                        @guest
-                            <li><a href="{{ route('login') }}">Login</a></li>
-                            <li><a href="{{ route('register') }}">Register</a></li>
-                        @endguest
-
-                        @auth
-                            <li>
-                                <form action="{{ route('logout') }}" method="POST">
-                                    @csrf
-                                    <input class="btn btn-outline-danger btn-sm" type="submit" value="Logout">
-                                </form>
-                            @endauth
-                        </li>
-                    </ul>
-
-                    <a href="#"
-                        class="burger light me-auto float-end mt-1 site-menu-toggle js-menu-toggle d-inline-block d-lg-none"
-                        data-toggle="collapse" data-target="#main-navbar">
-                        <span></span>
-                    </a>
-                </div>
+                    @endauth
+                </ul>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
+
 
     <div class="hero page-inner overlay" style="background-image: url('/front/images/commercial.webp')">
         <div class="container">
@@ -111,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <nav aria-label="breadcrumb" data-aos="fade-up" data-aos-delay="200">
                         <ol class="breadcrumb text-center justify-content-center">
                             @section('breadcrumb')
-                                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                             @show
                         </ol>
                     </nav>
