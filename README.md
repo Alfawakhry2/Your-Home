@@ -11,7 +11,7 @@
 #GitHub 
 
 # 1. Clone the project
-git clone https://github.com/ahmed/your-home.git
+git clone https://github.com/Alfawakhry2/Your-Home.git
 cd estate
 
 # 2. Install dependencies
