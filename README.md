@@ -20,7 +20,9 @@ npm install && npm run build
 
 # 3. Copy .env file and edit it
 cp .env.example .env
-# ثم يعدل بيانات الاتصال بقاعدة البيانات و البريد مثلاً
+and add your connection info (db , mailtrap or gmail provider , paymob integration links)
+and in paymob in redirect(response) callback in paymob integration for online card (enter the link of callback)
+http://127.0.0.1:8000/paymob/response => very important
 
 # 4. Generate app key
 php artisan key:generate
