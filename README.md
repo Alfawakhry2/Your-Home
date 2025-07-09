@@ -16,7 +16,7 @@
 
 # 2. Install dependencies
 ### composer install
-### npm install && npm run build
+### npm install && npm run build or npm run dev 
 
 # 3. Copy .env file and edit it
 ### cp .env.example .env
