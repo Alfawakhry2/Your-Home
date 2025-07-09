@@ -155,7 +155,7 @@
 
                                 <div class="d-grid">
                                     <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold">
-                                        <i class="bi bi-lock-fill me-2"></i>Reservation
+                                        <i class="bi bi-lock-fill me-2"></i>Reservation & Pay 
                                         </a>
                                 </div>
 
