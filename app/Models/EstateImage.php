@@ -6,15 +6,30 @@ use Illuminate\Database\Eloquent\Model;
 
 class EstateImage extends Model
 {
-    protected $fillable =[
+    protected $fillable = [
         'estate_id',
         'image',
-        'is_main' ,
+        'is_main',
         'order',
-
     ];
 
-    public function estate(){
+    protected $hidden = [
+        'image'
+    ];
+
+    protected $appends = [
+        'image_url'
+    ];
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return asset('front/images/default.png');
+        }
+        return asset('storage/' . $this->image);
+    }
+    public function estate()
+    {
         return $this->belongsTo(Estate::class);
     }
 }

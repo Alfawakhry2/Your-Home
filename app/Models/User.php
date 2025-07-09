@@ -3,14 +3,19 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -34,8 +39,13 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'image',
     ];
 
+    protected $appends =[
+        'image_url'
+    ];
+    
     /**
      * Get the attributes that should be cast.
      *
@@ -50,7 +60,52 @@ class User extends Authenticatable
     }
 
     ## Relationships
-    public function estats(){
+    public function estates()
+    {
         return $this->hasMany(Estate::class);
+    }
+
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+
+    // authourization filament and front
+    public function canAccessFilament(): bool
+    {
+        return in_array($this->role, ['admin', 'seller']);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isSeller(): bool
+    {
+        return $this->role === 'seller';
+    }
+
+    public function isBuyer(): bool
+    {
+        return $this->role === 'buyer';
+    }
+
+
+    //after implements the FilamentUser
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return in_array($this->role, ['admin', 'seller']);
+    }
+
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return asset('front/images/default.png');
+        }
+        return asset('storage/' . $this->image);
     }
 }

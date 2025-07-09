@@ -4,8 +4,8 @@
 
 @section('breadcrumb')
     @parent
-    <li class="breadcrumb-item"><a href="index.html">Estats</a></li>
-    <li class="breadcrumb-item"><a href="index.html">{{ $estate->title }}</a></li>
+    <li class="breadcrumb-item"><a href="{{ url()->previous() }}">Estats</a></li>
+    <li class="breadcrumb-item"><a href="{{ url()->current() }}">{{ $estate->title }}</a></li>
 @endsection
 
 
@@ -15,6 +15,7 @@
             <div class="row">
                 <!-- Main Content Column -->
                 <h2 class="text-center text-gray mb-5">{{ 'Estate Details' }}</h2>
+                @include('alerts')
                 <div class="col-lg-8">
                     <!-- Property Gallery -->
                     <div class="property-gallery mb-5">
@@ -85,14 +86,14 @@
                             <form action="{{ route('cart.store') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="estate_id" value="{{ $estate->id }}">
-                            <div class="d-flex justify-content-center">
-                            <button type="submit" class="btn btn-secondary w-50 py-2 fw-bold rounded-pill mb-5">
-                                <i class="bi bi-star me-2"></i> Add To Interested List
-                            </button>
-                            </div>
+                                <div class="d-flex justify-content-center">
+                                    <button type="submit" class="btn btn-secondary w-50 py-2 fw-bold rounded-pill mb-5">
+                                        <i class="bi bi-star me-2"></i> Add To Interested List
+                                    </button>
+                                </div>
                             </form>
                             {{-- <div class="property-features mb-5">
-                            <h4 class="fw-bold mb-3">المميزات</h4>
+                            <h4 class="fw-bold mb-3"></h4>
                             <div class="row">
                                 @foreach ($estate->features as $feature)
                                 <div class="col-md-6 mb-2">
@@ -186,7 +187,9 @@
                     <!-- Price Card -->
                     <div class="price-card card shadow-sm border-0 mt-4">
                         <div class="card-body p-4">
-                            <h5 class="fw-bold mb-3">Estate Price <span class="badge @if($estate->type=='rent') bg-success @else bg-danger  @endif fs-6"> For {{ Str::ucfirst($estate->type) }}</span></h5>
+                            <h5 class="fw-bold mb-3">Estate Price <span
+                                    class="badge @if ($estate->type == 'rent') bg-success @else bg-danger @endif fs-6">
+                                    For {{ Str::ucfirst($estate->type) }}</span></h5>
 
 
                             <div class="d-flex align-items-center mb-3">
@@ -196,9 +199,10 @@
                                     <span class="fw-bold fs-4">EGP {{ number_format($estate->price) }}</span>
                                 </div>
                             </div>
-                            <button class="btn btn-danger w-100 py-2 fw-bold rounded-pill">
+                            <a href="{{ route('checkout.estate' , $estate->id) }}" class="btn btn-danger w-100 py-2 fw-bold rounded-pill">
                                 <i class="bi bi-credit-card me-2"></i>Reserve Estate Now
-                            </button>
+
+                            </a>
                         </div>
                     </div>
                 </div>

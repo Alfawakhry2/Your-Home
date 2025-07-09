@@ -6,12 +6,15 @@ use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
 use App\Models\Estate;
+use Filament\Forms\Set;
 use App\Models\Category;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\Filter;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
@@ -21,11 +24,11 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Widgets\StatsOverviewWidget\Stat;
 use App\Filament\Resources\EstateResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EstateResource\RelationManagers;
 use App\Filament\Resources\EstateResource\RelationManagers\UserRelationManager;
-use Filament\Forms\Set;
 
 class EstateResource extends Resource
 {
@@ -37,18 +40,23 @@ class EstateResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $userRole = Auth::user()->role ;
+
         return $form
             ->schema([
                 Section::make('Basic Information')
                     ->columns(2)
                     ->schema([
-                        Select::make('user_id')->label('Owner')
-                            ->options(function () {
-                                return User::where('role', 'seller')->pluck('name', 'id');
-                            })
+                        $userRole === 'admin'
+                            ? Select::make('user_id')
+                            ->label('Owner')
+                            ->relationship('user', 'name')
                             ->searchable()
                             ->preload()
-                            ->required(),
+                            ->required()
+                            : Hidden::make('user_id')
+                            ->default(Auth::id()),
+
 
                         Select::make('category_id')
                             ->relationship('category', 'title')
@@ -57,9 +65,9 @@ class EstateResource extends Resource
                             ->required(),
 
                         TextInput::make('title')
-                            ->live(onBlur:true)
-                            ->afterStateUpdated(function ($operation, $state,Set $set) {
-                            ## opertaion tell you that in edit or create form
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function ($operation, $state, Set $set) {
+                                ## opertaion tell you that in edit or create form
                                 // if($operation === 'edit') return;
                                 $set('slug', Str::slug($state));
                             })
@@ -71,8 +79,7 @@ class EstateResource extends Resource
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(50)
-                            ->columnSpan(1)
-                            ->disabled(),
+                            ->columnSpan(1),
 
                         TextInput::make('price')
                             ->numeric()
@@ -159,6 +166,7 @@ class EstateResource extends Resource
                 TextColumn::make('title')->label('Title')->sortable()->searchable(),
                 TextColumn::make('category.title')->label('Estate Type')->badge()->searchable()
                     ->color('gray'),
+
                 TextColumn::make('user.name')->label('Owner')->badge()->color('warning'),
                 TextColumn::make('description')->limit(50)->label('Description')->searchable(),
                 TextColumn::make('status')->label('Estate Status')
@@ -216,5 +224,25 @@ class EstateResource extends Resource
             'create' => Pages\CreateEstate::route('/create'),
             'edit' => Pages\EditEstate::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (Auth::user()->role == 'seller') {
+            $query->where('user_id', Auth::id());
+        }
+        return $query;
+    }
+
+    # filamant when create if there are hidden , may not send with form , and to confirm , you should send it after form created
+    # with mutatedFormDataBeforeCreate function 
+    public static function mutateFormDataBeforeCreate(array $data): array
+    {
+        if (auth()->user()->role === 'seller') {
+            $data['user_id'] = auth()->id();
+        }
+        return $data;
     }
 }
