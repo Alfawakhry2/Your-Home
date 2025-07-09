@@ -49,6 +49,27 @@ class PaymentController extends Controller
         return view('front.payments.pay', compact('iframeUrl'));
     }
 
+
+    //  Callback
+    public function callback(Request $request)
+    {
+        $merchantOrderId = $request->input('merchant_order_id');
+        [$reservationId]  = explode('_', $merchantOrderId);
+
+        $reservation = Reservation::find($reservationId);
+        if (! $reservation) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        $reservation->status         = 'confirmed';
+        $reservation->payment_status = 'paid';
+        $reservation->payment_details = json_encode($request->all());
+        $reservation->save();
+
+        return response()->json(['message' => 'Processed'], 200);
+    }
+
+    // Redirect
     public function response(Request $request)
     {
         $merchantOrderId = $request->query('merchant_order_id');
@@ -71,26 +92,11 @@ class PaymentController extends Controller
         $reservation->payment_details = json_encode($request->all());
         $reservation->save();
 
+        if ($reservation->payment_status == 'pending' && $reservation->status == 'pending') {
+            return redirect()->route('reservation.index')
+                ->with('error', 'Paied Failed , try in another Time ');
+        }
         return redirect()->route('reservation.index')
             ->with('success', 'Paied Successfully ');
-    }
-
-    //  Callback
-    public function callback(Request $request)
-    {
-        $merchantOrderId = $request->input('merchant_order_id');
-        [$reservationId]  = explode('_', $merchantOrderId);
-
-        $reservation = Reservation::find($reservationId);
-        if (! $reservation) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
-
-        $reservation->status         = 'confirmed';
-        $reservation->payment_status = 'paid';
-        $reservation->payment_details = json_encode($request->all());
-        $reservation->save();
-
-        return response()->json(['message' => 'Processed'], 200);
     }
 }

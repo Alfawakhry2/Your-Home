@@ -8,7 +8,7 @@ use Exception;
 
 class PaymobService
 {
-    protected $apiKey;
+    protected $apiKey; // related to authentication 
     protected $integrationId;
     protected $iframeId;
     protected $authUrl;

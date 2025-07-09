@@ -50,12 +50,17 @@ Route::middleware([RedirectIfNotBuyer::class, 'auth', 'verified'])
             ->name('paymob.pay');
 
 
+        //transaction processed callback
         Route::post('paymob/callback', [PaymentController::class, 'callback'])
             ->name('paymob.callback');
 
+        //transaction response(redirect) callback
         Route::get('paymob/response', [PaymentController::class, 'response'])
             ->name('paymob.response');
 
+        //if the payment failed and need to re-pay
+        Route::get('payments/repay/{reservation}', [PaymentController::class, 'pay'])
+            ->name('payments.repay');
 
         Route::get('reservation', [ReservationController::class, 'index'])->name('reservation.index');
         Route::post('reservation/estate/{id}', [ReservationController::class, 'store'])->name('reservation.store');
