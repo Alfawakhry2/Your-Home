@@ -1,14 +1,14 @@
 ## Tech Stack:
-#php (version 8.2.4)
-#MySQL 
-#composer (Composer version 2.8.6)
-#Laravel 12 
-#Filament (v3.3.0)
-#Sanctum (php artisan install:api)=> will install sanctum
-#Paymob API 
-#RESTful APIs (Tested with Postman)
-#Api Documentaion => https://documenter.getpostman.com/view/29335427/2sB34eHgxP
-#GitHub 
+# php (version 8.2.4)
+# MySQL 
+# composer (Composer version 2.8.6)
+# Laravel 12 
+# Filament (v3.3.0)
+# Sanctum (php artisan install:api)=> will install sanctum
+# Paymob API 
+# RESTful APIs (Tested with Postman)
+# Api Documentaion => https://documenter.getpostman.com/view/29335427/2sB34eHgxP
+# GitHub 
 
 # 1. Clone the project
 git clone https://github.com/Alfawakhry2/Your-Home.git
