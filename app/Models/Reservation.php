@@ -13,7 +13,7 @@ class Reservation extends Model
         'start_date',
         'end_date',
         'status',
-        'price' ,
+        'price',
         'payment_status',
     ];
 
@@ -26,5 +26,26 @@ class Reservation extends Model
     public function estate()
     {
         return $this->belongsTo(Estate::class);
+    }
+
+    //related to callback and response
+    public static function handlePaymentStatus($merchantOrderId, array $data, bool $isSuccess)
+    {
+
+        $parts = explode('_', $merchantOrderId);
+        $reservationId = $parts[0];
+
+        //we used self , so is static
+        $reservation = self::find($reservationId);
+        if (! $reservation) {
+            return null;
+        }
+
+        $reservation->status         = $isSuccess ? 'confirmed' : 'pending';
+        $reservation->payment_status = $isSuccess ? 'paid' : 'pending';
+        $reservation->payment_details = json_encode($data);
+        $reservation->save();
+
+        return $reservation;
     }
 }

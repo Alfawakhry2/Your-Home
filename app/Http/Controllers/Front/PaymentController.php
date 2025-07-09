@@ -12,90 +12,92 @@ class PaymentController extends Controller
 {
     protected $paymob;
 
+    // intialize the PaymobService when contoller is used
     public function __construct(PaymobService $paymob)
     {
         $this->paymob = $paymob;
     }
 
+    // we will use the reservation id from our db , to pay
     public function pay($reservationId)
     {
+        //check if reservation already created
         $reservation = Reservation::findOrFail($reservationId);
-
+        //we say that deal with cents and need to convert from pound to cents
         $amountCents = $reservation->price * 100;
+
 
         $orderId = $this->paymob->createOrder(
             $amountCents,
             $reservation->id . '_' . now()->timestamp
         );
         $billingData = [
+            ## the first name and last name are mandatory ,
             'first_name'   => auth()->user()->name,
-            'last_name'    => auth()->user()->last_name ?? ' User',
+            'last_name'    => auth()->user()->last_name ?? ' User', // i do that , cause i not have the last name
             'email'        => auth()->user()->email,
             'phone_number' => auth()->user()->phone ?? '',
-            'street'       => $reservation->estate->street ?? 'Test St.',
-            'building'     => $reservation->estate->building_number ?? '1',
-            'floor'        => $reservation->estate->floor ?? '1',
-            'apartment'    => $reservation->estate->apartment_number ?? '101',
-            'city'         => $reservation->estate->city ?? 'Cairo',
+            //this billing data i don't have , cause it is reservation , not delivery , but this data mandatory
+            'street'       => $reservation->estate->street ?? 'Unkown Street ',
+            'building'     => $reservation->estate->building_number ?? 'unknown',
+            'floor'        => $reservation->estate->floor ?? 'unknown',
+            'apartment'    => $reservation->estate->apartment_number ?? 'unknown',
+            'city'         => $reservation->estate->city ?? 'unknown',
             'country'      => $reservation->estate->country ?? 'EG',
-            'postal_code'  => $reservation->estate->postal_code ?? '12345',
+            'postal_code'  => $reservation->estate->postal_code ?? 'unknown',
         ];
-        // payment key
+        // generate payment key
         $paymentKey = $this->paymob->paymentKey($amountCents, $orderId, $billingData);
 
-        // iframe
+        // get iframe with payment_token
         $iframeUrl = $this->paymob->getPaymentIframeUrl($paymentKey);
 
+        //the front page that i created and put the iframe there
         return view('front.payments.pay', compact('iframeUrl'));
     }
 
 
-    //  Callback
+    //  Callback (Server to Server ) => tell your server the status of payment
     public function callback(Request $request)
     {
-        $merchantOrderId = $request->input('merchant_order_id');
-        [$reservationId]  = explode('_', $merchantOrderId);
 
-        $reservation = Reservation::find($reservationId);
+        //handlePaymentStatus is static function that defined in reservation model
+        $reservation = Reservation::handlePaymentStatus(
+            $request->input('merchant_order_id'),
+            $request->all(),
+            true
+        );
+
         if (! $reservation) {
             return response()->json(['error' => 'Not found'], 404);
         }
 
-        $reservation->status         = 'confirmed';
-        $reservation->payment_status = 'paid';
-        $reservation->payment_details = json_encode($request->all());
-        $reservation->save();
-
         return response()->json(['message' => 'Processed'], 200);
     }
 
-    // Redirect
+    // Redirect (as call back , but to client )
+    ## redirect to the reservation page with message
     public function response(Request $request)
     {
-        $merchantOrderId = $request->query('merchant_order_id');
-        [$reservationId] = explode('_', $merchantOrderId);
+        $isSuccess = $request->query('success') == 'true' || $request->query('success') === true;
 
-        $reservation = Reservation::find($reservationId);
+        //handlePaymentStatus is static function that defined in reservation model
+        $reservation = Reservation::handlePaymentStatus(
+            $request->query('merchant_order_id'),
+            $request->all(),
+            $isSuccess
+        );
+
         if (! $reservation) {
             return redirect()->route('estates.index')
                 ->with('error', 'Reservation Not Exist !');
         }
 
-        if ($request->query('success') == 'true' || $request->query('success') === true) {
-            $reservation->status         = 'confirmed';
-            $reservation->payment_status = 'paid';
-        } else {
-            $reservation->status         = 'pending';
-            $reservation->payment_status = 'pending';
-        }
-
-        $reservation->payment_details = json_encode($request->all());
-        $reservation->save();
-
-        if ($reservation->payment_status == 'pending' && $reservation->status == 'pending') {
+        if (! $isSuccess) {
             return redirect()->route('reservation.index')
                 ->with('error', 'Paied Failed , try in another Time ');
         }
+
         return redirect()->route('reservation.index')
             ->with('success', 'Paied Successfully ');
     }

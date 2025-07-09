@@ -46,6 +46,7 @@ Route::middleware([RedirectIfNotBuyer::class, 'auth', 'verified'])
             ->name('checkout.pay');
 
 
+            //will go to pay function , then return to
         Route::get('pay/{reservation}', [PaymentController::class, 'pay'])
             ->name('paymob.pay');
 
