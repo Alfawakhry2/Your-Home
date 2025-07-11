@@ -22,7 +22,6 @@ class CheckRole
                 'message' => 'Unauthorized'
             ], 403);
         }
-
         return $next($request);
     }
 }

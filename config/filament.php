@@ -3,7 +3,6 @@
 return [
 
     'auth_password_broker' => 'users',
-
     'panels' => [
         'admin' => [
             'path' => 'admin',

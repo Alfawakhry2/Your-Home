@@ -5,6 +5,8 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Auth\PasswordReset\ResetPassword;
 use Filament\Pages;
 use Filament\Panel;
+use App\Models\User;
+use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use App\Filament\Widgets\dashboardWidget;

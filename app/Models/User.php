@@ -47,6 +47,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'image_url'
     ];
 
+
     /**
      * Get the attributes that should be cast.
      *

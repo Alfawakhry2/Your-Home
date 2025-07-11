@@ -6,7 +6,7 @@ use App\Models\Reservation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
-use App\Filament\Resources\ReservationResource;
+use App\Http\Resources\ReservationResource;
 
 class ReservationController extends Controller
 {
