@@ -36,7 +36,7 @@ class EstatePolicy
      */
     public function update(User $user, Estate $estate): bool
     {
-        return $user->id === $estate->user_id || $user->role === 'admin';
+        return true;
     }
 
     /**
@@ -44,7 +44,7 @@ class EstatePolicy
      */
     public function delete(User $user, Estate $estate): bool
     {
-        return $user->id === $estate->user_id || $user->role === 'admin';
+        return true;
     }
 
     /**
@@ -52,7 +52,7 @@ class EstatePolicy
      */
     public function restore(User $user, Estate $estate): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -60,6 +60,6 @@ class EstatePolicy
      */
     public function forceDelete(User $user, Estate $estate): bool
     {
-        return false;
+        return true;
     }
 }

@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
@@ -86,33 +87,33 @@ class CategoryResource extends Resource
         ];
     }
 
+    public static function canViewAny(): bool
+    {
+        return Auth::user()->can('view any category');
+    }
+    public static function canView(Model $record): bool
+    {
+        return Auth::user()->can('view category');
+    }
+
     public static function canCreate(): bool
     {
-        return auth()->user()->role === 'admin';
+        return Auth::user()->can('create category');
     }
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()->role === 'admin';
+        return Auth::user()->can('update category');
     }
 
     public static function canDelete(Model $record): bool
     {
-        return auth()->user()->role === 'admin';
+        return Auth::user()->can('delete category');
     }
 
     public static function canDeleteAny(): bool
     {
-        return auth()->user()->role === 'admin';
+        return Auth::user()->can('delete category');
     }
 
-    public static function canForceDelete(Model $record): bool
-    {
-        return auth()->user()->role === 'admin';
-    }
-
-    public static function canForceDeleteAny(): bool
-    {
-        return auth()->user()->role === 'admin';
-    }
 }

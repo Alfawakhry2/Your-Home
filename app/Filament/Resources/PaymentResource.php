@@ -37,7 +37,7 @@ class PaymentResource extends Resource
     {
         $query =  parent::getEloquentQuery()->where('payment_status', 'paid');
 
-        if (Auth::check() && Auth::user()->role === 'seller') {
+        if (Auth::check() && Auth::user()->type === 'seller') {
             $query->whereHas('estate', function ($q) {
                 $q->where('user_id', Auth::id());
             });

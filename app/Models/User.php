@@ -11,11 +11,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens , HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -27,7 +28,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'email',
         'phone',
         'image',
-        'role',
+        'type',
         'password',
     ];
 
@@ -45,7 +46,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     protected $appends =[
         'image_url'
     ];
-    
+
     /**
      * Get the attributes that should be cast.
      *
@@ -75,29 +76,29 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     // authourization filament and front
     public function canAccessFilament(): bool
     {
-        return in_array($this->role, ['admin', 'seller']);
+        return in_array($this->type, ['admin','co-admin','seller']);
     }
 
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->type === 'admin';
     }
 
     public function isSeller(): bool
     {
-        return $this->role === 'seller';
+        return $this->type === 'seller';
     }
 
     public function isBuyer(): bool
     {
-        return $this->role === 'buyer';
+        return $this->type === 'buyer';
     }
 
 
     //after implements the FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
-        return in_array($this->role, ['admin', 'seller']);
+        return in_array($this->type, ['admin', 'seller' , 'co-admin']);
     }
 
 

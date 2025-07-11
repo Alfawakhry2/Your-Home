@@ -15,7 +15,7 @@ class dashboardWidget extends BaseWidget
     {
         return [
             #admins
-            Stat::make('Admin' , User::where('role' , 'admin')->count())
+            Stat::make('Admin' , User::where('type' , 'admin')->count())
             ->description('Adminstrator Of Website ')
             ->descriptionIcon('heroicon-o-user-circle' , IconPosition::Before)
             ->chart([1,1])
@@ -23,7 +23,7 @@ class dashboardWidget extends BaseWidget
             ,
 
             #seller
-            Stat::make('Seller' , User::where('role' , 'seller')->count())
+            Stat::make('Seller' , User::where('type' , 'seller')->count())
             ->description('Seller That Own Estates ')
             ->descriptionIcon('heroicon-o-user' , IconPosition::Before)
             ->chart([1,2,3,4])
@@ -32,7 +32,7 @@ class dashboardWidget extends BaseWidget
 
 
             #buyer
-            Stat::make('Member' , User::where('role' , 'buyer')->count())
+            Stat::make('Member' , User::where('type' , 'buyer')->count())
             ->description('Member That Can buy or rent estate ')
             ->descriptionIcon('heroicon-m-user-group' , IconPosition::Before)
             ->chart([1,2,3,4,5])

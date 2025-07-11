@@ -29,7 +29,8 @@ class ReservationPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
+
     }
 
     /**
@@ -37,7 +38,8 @@ class ReservationPolicy
      */
     public function update(User $user, Reservation $reservation): bool
     {
-        return false;
+        return true;
+
     }
 
     /**
@@ -45,7 +47,8 @@ class ReservationPolicy
      */
     public function delete(User $user, Reservation $reservation): bool
     {
-        return false;
+        return true;
+
     }
 
     /**
@@ -53,7 +56,8 @@ class ReservationPolicy
      */
     public function restore(User $user, Reservation $reservation): bool
     {
-        return false;
+        return true;
+
     }
 
     /**
@@ -61,6 +65,7 @@ class ReservationPolicy
      */
     public function forceDelete(User $user, Reservation $reservation): bool
     {
-        return false;
+        return true;
+
     }
 }

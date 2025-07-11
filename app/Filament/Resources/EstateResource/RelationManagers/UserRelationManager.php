@@ -33,7 +33,7 @@ class UserRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name'),
-                TextColumn::make('role')->badge(),
+                TextColumn::make('type')->badge(),
                 ImageColumn::make('image')->circular()
             ])
             ->filters([

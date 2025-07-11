@@ -18,6 +18,7 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\FileUpload;
@@ -40,7 +41,7 @@ class EstateResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $userRole = Auth::user()->role ;
+        $userRole = Auth::user()->role;
 
         return $form
             ->schema([
@@ -230,19 +231,48 @@ class EstateResource extends Resource
     {
         $query = parent::getEloquentQuery();
 
-        if (Auth::user()->role == 'seller') {
+        if (Auth::user()->type == 'seller') {
             $query->where('user_id', Auth::id());
         }
         return $query;
     }
 
     # filamant when create if there are hidden , may not send with form , and to confirm , you should send it after form created
-    # with mutatedFormDataBeforeCreate function 
+    # with mutatedFormDataBeforeCreate function
     public static function mutateFormDataBeforeCreate(array $data): array
     {
-        if (auth()->user()->role === 'seller') {
-            $data['user_id'] = auth()->id();
+        if (Auth::user()->type === 'seller') {
+            $data['user_id'] = Auth::id();
         }
         return $data;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()->can('view any estate');
+    }
+    public static function canView(Model $record): bool
+    {
+        return Auth::user()->can('view estate');
+    }
+
+    public static function canCreate(): bool
+    {
+        return Auth::user()->can('create estate');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return Auth::user()->can('update estate');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return Auth::user()->can('delete estate');
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return Auth::user()->can('delete estate');
     }
 }

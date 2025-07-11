@@ -48,7 +48,7 @@ class LoginController extends Controller
         // take request , email and password , then merge the role => buyer to the array
         //then credentials will send to authenticated to check all are correct
         return array_merge($request->only($this->username(), 'password'), [
-            'role' => 'buyer',
+            'type' => 'buyer',
         ]);
     }
 }

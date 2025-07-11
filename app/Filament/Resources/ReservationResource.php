@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ReservationResource\Pages;
@@ -31,18 +32,18 @@ class ReservationResource extends Resource
         return $form
             ->schema([
                 Select::make('status')
-                ->options([
-                    'pending' => 'Pending',
-                    'confirmed' => 'Confirmed',
-                    'rejected' => 'Rejected',
-                    'completed' => 'Completed',
-                ]),
+                    ->options([
+                        'pending' => 'Pending',
+                        'confirmed' => 'Confirmed',
+                        'rejected' => 'Rejected',
+                        'completed' => 'Completed',
+                    ]),
 
                 Select::make('payment_status')
-                ->options([
-                    'pending' => 'Pending',
-                    'completed' => 'Completed',
-                ]),
+                    ->options([
+                        'pending' => 'Pending',
+                        'completed' => 'Completed',
+                    ]),
             ]);
     }
 
@@ -107,15 +108,41 @@ class ReservationResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
-        $estate_ids = auth()->user()->estates()->pluck('id')->toArray();
-        if (Auth::user()->role == 'seller') {
+        $estate_ids = Auth::user()->estates()->pluck('id')->toArray();
+        if (Auth::user()->type == 'seller') {
             $query->whereIn('estate_id', $estate_ids);
         }
         return $query;
     }
 
+
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()->can('view any reservation');
+    }
+    public static function canView(Model $record): bool
+    {
+        return Auth::user()->can('view reservation');
+    }
+
     public static function canCreate(): bool
     {
-        return false ;
+        return Auth::user()->can('create reservation');
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return Auth::user()->can('update reservation');
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return Auth::user()->can('delete reservation');
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return Auth::user()->can('delete reservation');
     }
 }

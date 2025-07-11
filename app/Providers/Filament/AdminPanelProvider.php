@@ -5,8 +5,6 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Auth\PasswordReset\ResetPassword;
 use Filament\Pages;
 use Filament\Panel;
-use App\Models\User;
-use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use App\Filament\Widgets\dashboardWidget;
@@ -38,7 +36,6 @@ class AdminPanelProvider extends PanelProvider
             // ->authGuard('filament')
             ->colors([
                 'primary' => Color::Amber,
-
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -48,8 +45,11 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 dashboardWidget::class,
-            ])
-            ->middleware([
+            ])->authMiddleware([
+                Authenticate::class,
+                AdminAccessControl::class,
+                // EnsureEmailIsVerified::class
+            ]) ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
@@ -59,10 +59,6 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                EnsureEmailIsVerified::class
-            ])->authMiddleware([
-                Authenticate::class,
-                AdminAccessControl::class,
             ]);
     }
 }

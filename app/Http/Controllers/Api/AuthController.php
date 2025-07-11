@@ -23,7 +23,7 @@ class AuthController extends Controller
             'name'     => $data['name'],
             'email'    => $data['email'],
             'password' => bcrypt($data['password']),
-            'role'     => 'buyer',
+            'type'     => 'buyer',
         ]);
 
         $token = $user->createToken('api_token')->plainTextToken;

@@ -14,8 +14,8 @@ class ReservationController extends Controller
     public function index(Request $request)
     {
         Gate::authorize('viewAny' , Reservation::class);
-        
-        if ($request->user()->role === 'admin') {
+
+        if ($request->user()->type === 'admin') {
             $reservations = Reservation::paginate(10);
         } else {
             $reservations = Reservation::whereHas('estate', function ($query) use ($request) {

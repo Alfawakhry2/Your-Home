@@ -17,7 +17,7 @@ class AdminAccessControl
     public function handle(Request $request, Closure $next): Response
     {
         $auth = Auth::user();
-        if(!$auth || !in_array($auth->role , ['admin' , 'seller'])){
+        if(!$auth || !in_array($auth->type , ['admin' , 'seller' ,'co-admin'])){
             return redirect()->route('home');
         }
         return $next($request);

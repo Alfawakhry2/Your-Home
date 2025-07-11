@@ -21,7 +21,7 @@ class EstateController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->user()->role === 'admin') {
+        if ($request->user()->type === 'admin') {
             $estates = Estate::with('reservations', 'images')->filter($request->query())->paginate(6);
         } else {
             $estates = $request->user()->estates;

@@ -16,7 +16,7 @@ class RedirectIfNotBuyer
      */
     public function handle(Request $request, Closure $next): Response
     {
-         if (!Auth::check() || Auth::user()->role !== 'buyer') {
+         if (!Auth::check() || Auth::user()->type !== 'buyer') {
             return redirect('/admin');
         }
 

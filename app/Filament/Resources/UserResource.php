@@ -5,98 +5,142 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Illuminate\Validation\Rule;
 use Filament\Resources\Resource;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\ImageColumn;
+use Spatie\Permission\Models\Permission;
 use Filament\Forms\Components\FileUpload;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\CheckboxList;
 use App\Filament\Resources\UserResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Filament\Resources\UserResource\RelationManagers\EstatsRelationManager;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    // protected static ?string $navigationGroup = 'My Home website';
-
-
-    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                TextInput::make('name')->rules('required|string|min:3|max:50'),
-                TextInput::make('email')->required()->email()->unique(ignoreRecord: true),
-                TextInput::make('phone')->required(fn(string $context): bool => $context === 'create')->unique(ignoreRecord: true),
-                Select::make('role')->options([
-                    'admin' => 'Admin',
-                    'seller' => 'Seller',
-                    'buyer' => 'Buyer',
-                ])->rules('required|in:admin,seller,buyer'),
-                TextInput::make('password')->label('Password')
-                    ->password()
-                    ->dehydrated(fn($state) => filled($state))
-                    ->required(fn(string $context): bool => $context === 'create')
-                    ->maxLength(255)
-                    ->same('password_confirmation'),
-                TextInput::make('password_confirmation')->password(),
+        return $form->schema([
+            TextInput::make('name')
+                ->label('Full Name')
+                ->required()
+                ->minLength(3),
 
-                FileUpload::make('image')->rules('required|image|mimes:png,jpg,jpeg')->disk('public')->directory('users'),
+            TextInput::make('email')
+                ->label('Email')
+                ->required()
+                ->email()
+                ->unique(ignoreRecord: true),
 
-            ]);
+            TextInput::make('phone')
+                ->label('Phone Number')
+                ->required(fn(string $context) => $context === 'create')
+                ->unique(ignoreRecord: true),
+
+            Section::make('Role & Permissions')
+                ->columns(2)
+                ->schema([
+                    Select::make('role_id')
+                        ->label('Role')
+                        ->options(fn() => Role::pluck('name', 'id'))
+                        ->required(fn(string $context) => $context === 'create')
+                        // at first there are user ? => roles (relattion from HasRoles) first =>the first role ,
+                        // it may has many roles , and then take the id of this role
+                        ->default(fn( $record) => $record->roles()->first()->id)
+
+                        //if the value of this select change , then apply the next function
+                        ->reactive()
+                        //means after the value change , do the function
+                        //state (new value(id)) ,and assign this new value with type (in user migration)
+                        ->afterStateUpdated(function (?string $state, Set $set) {
+                            $role = Role::find($state);
+                            if ($role) {
+                                $set('type', $role->name);
+                                // Auto-select role's permissions for non-admin roles
+                                if ($role->name !== 'admin') {
+                                    $set('permissions', $role->permissions->pluck('name')->toArray());
+                                } else {
+                                    $set('permissions', []); // Clear for admin
+                                }
+                            }
+                        })
+                        //this values will send when submit form
+                        ->dehydrated()
+                        ->live(),
+
+                    CheckboxList::make('permissions')
+                        ->label('Permissions')
+                        ->options(fn() => Permission::pluck('name', 'name'))
+                        ->columns(2)
+                        ->default(fn(?Model $record) => $record?->getPermissionNames()->toArray() ?? [])
+                        ->visible(function (Get $get) {
+                            $roleId = $get('role_id');
+                            if (!$roleId) return false;
+
+                            $role = Role::find($roleId);
+                            return $role && $role->name !== 'admin'; // Show for non-admin roles
+                        })
+                        ->dehydrated(),
+                ]),
+
+            TextInput::make('type')
+                ->hidden()
+                ->dehydrated(),
+
+            TextInput::make('password')
+                ->label('Password')
+                ->password()
+                ->dehydrated(fn($state) => filled($state))
+                ->required(fn(string $context) => $context === 'create')
+                ->same('password_confirmation'),
+
+            TextInput::make('password_confirmation')
+                ->password(),
+
+            FileUpload::make('image')
+                ->label('Image')
+                ->image()
+                ->disk('public')
+                ->directory('users')
+                ->rules(['nullable', 'image', 'mimes:png,jpg,jpeg']),
+        ]);
     }
 
-    public static function table(Table $table): Table
+    public static function table(Tables\Table $table): Tables\Table
     {
         return $table
             ->columns([
-                TextColumn::make('id')->label('#')
-                ->sortable()
-                ->searchable()
-                ,
-                TextColumn::make('name')->label('Name')
-                ->searchable(),
-                TextColumn::make('email')->label("Email"),
-                TextColumn::make('role')->badge()->color(function ($state) {
+                TextColumn::make('id')->label('#')->sortable(),
+                TextColumn::make('name')->label('Full Name')->searchable(),
+                TextColumn::make('email')->label('Email'),
+                TextColumn::make('type')->label('Role')->badge()
+                ->color(function ($state) {
                     return match ($state) {
                         'admin' => 'danger',
+                        'co-admin'=>'primary',
                         'seller' => 'info',
                         'buyer' => 'success',
                     };
-                })->sortable()
-                ->searchable()
-                ,
-                ImageColumn::make('image')->label('Avatar')->circular(),
+                }),
+                ImageColumn::make('image')->label('Image')->circular(),
             ])
-            ->filters([
-                SelectFilter::make('role')
-                ->label('Role')
-                ->options([
-                    'admin'=>'Admin',
-                    'seller'=>'Seller',
-                    'buyer' => 'Buyer',
-                ])
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
@@ -112,19 +156,32 @@ class UserResource extends Resource
         return [
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return Auth::user()?->can('view any user') ?? false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return Auth::user()?->can('create user') ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return Auth::user()->role == 'admin';
+        return Auth::user()?->can('update user') ?? false;
     }
 
-    // public static function canViewAny(): bool
-    // {
-    //     return Auth::user()->role == 'admin';
-    // }
+    public static function canDelete(Model $record): bool
+    {
+        return Auth::user()?->can('delete user') && Auth::id() !== $record->id;
+    }
 
-
+    public static function canDeleteAny(): bool
+    {
+        return Auth::user()?->can('delete any user') ?? false;
+    }
 }

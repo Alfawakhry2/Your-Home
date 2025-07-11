@@ -16,7 +16,7 @@ class RedirectIfFilamentUser
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && in_array(Auth::user()->role, ['admin', 'seller'])) {
+        if (Auth::check() && in_array(Auth::user()->type, ['admin', 'seller' ,'co-admin'])) {
             return redirect('/admin');
         }
         return $next($request);

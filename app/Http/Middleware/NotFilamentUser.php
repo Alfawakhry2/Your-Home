@@ -17,7 +17,7 @@ class NotFilamentUser
     {
         $user = $request->user();
 
-        if ($user && !in_array($user->role, ['buyer'])) {
+        if ($user && !in_array($user->type, ['buyer'])) {
             return response()->json([
                 'message' => 'Unauthorized'
             ], 403);
