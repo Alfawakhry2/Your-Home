@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Estate;
 use Illuminate\Console\Command;
 use App\Events\EstateAvailableForNotification;
+use Illuminate\Support\Facades\Schedule;
 
 class CheckEstateAvailability extends Command
 {
@@ -42,5 +43,12 @@ class CheckEstateAvailability extends Command
         }
 
         $this->info('Checked all rented estates.');
+
+        return self::SUCCESS;
     }
+
+    public function schedule(Schedule $schedule):void {
+        $schedule->dailyAt('00:01');
+    }
+
 }

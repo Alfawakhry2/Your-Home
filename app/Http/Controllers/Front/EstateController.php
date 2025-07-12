@@ -27,7 +27,7 @@ class EstateController extends Controller
             ->type($request->query('type'))
             ->bedrooms($request->query('bedrooms'))
             ->bathrooms($request->query('bathrooms'))
-            ->paginate(6);
+            ->paginate(9);
         return view('front.estates', compact('estates', 'locations', 'categories'));
     }
 

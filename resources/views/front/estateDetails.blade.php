@@ -104,6 +104,12 @@
                                         </button>
                                     </div>
                                 </form>
+                            @elseif($estate->status == 'sold')
+                                <div class="d-flex justify-content-center">
+                                    <a href="{{ route('estates.index') }}" class="btn btn-dark w-50 py-2 fw-bold rounded-pill mb-5">
+                                        <i class="bi  me-2"></i> Not Available , Explore More
+                                    </a>
+                                </div>
                             @else
                                 <form action="{{ route('cart.store') }}" method="POST">
                                     @csrf
@@ -150,9 +156,11 @@
                     <!-- Owner Card -->
                     <div class="owner-card card shadow-sm border-0 sticky-top" style="top: 20px;">
                         <div class="card-body p-4 align-items-center">
-                            <div class="text-center mb-4">
-                                <img src="{{ asset('storage/' . $estate->user->image) }}" class="rounded-circle border"
+                            <div class="text-center mb-4 align-items-center">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <img src="{{ $estate->user->image_url }}" class="rounded-circle border"
                                     width="100" height="100" alt="Owner Photo">
+                                </div>
                                 <h5 class="mt-3 mb-1">{{ $estate->user->name }}</h5>
                                 <div class="d-flex justify-content-center align-items-center mb-3">
                                     {{-- <i class="bi bi-star-fill text-warning me-1"></i> --}}
@@ -199,12 +207,6 @@
                                 <button class="btn btn-primary w-100 py-2 mb-3 fw-bold rounded-pill">
                                     <i class="bi bi-chat-left-text me-2"></i>Send Message
                                 </button>
-                                <button class="btn btn-success w-100 py-2 mb-3 fw-bold rounded-pill">
-                                    <i class="bi bi-whatsapp me-2"></i>WhatsApp
-                                </button>
-                                <button class="btn btn-outline-dark w-100 py-2 fw-bold rounded-pill">
-                                    <i class="bi bi-telephone me-2"></i>Contact Me
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -224,21 +226,23 @@
                                     <span class="fw-bold fs-4">EGP {{ number_format($estate->price) }}</span>
                                 </div>
                             </div>
-                            @if ($estate->status === 'available')
+                            @if ($estate->status === 'rented')
+                                <form action="{{ route('estate.notifyMe', $estate->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-secondary w-100 py-2 fw-bold rounded-pill">
+                                        <i class="bi bi-bill-card me-2"></i>Send Notification When Available
+
+                                    </button>
+                                </form>
+                            @elseif ($estate->status === 'sold')
+                                <p class="text-danger">This Estate Sold!</p>
+                                <a class="btn btn-dark" href="{{ route('estates.index') }}">Explore More</a>
+                            @else
                                 <a href="{{ route('checkout.estate', $estate->id) }}"
                                     class="btn btn-danger w-100 py-2 fw-bold rounded-pill">
                                     <i class="bi bi-credit-card me-2"></i>Reserve Estate Now
 
                                 </a>
-                            @else
-                                <form action="{{ route('estate.notifyMe', $estate->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit"
-                                        class="btn btn-secondary w-100 py-2 fw-bold rounded-pill">
-                                        <i class="bi bi-bill-card me-2"></i>Send Notification When Available
-
-                                    </button>
-                                </form>
                             @endif
                         </div>
                     </div>

@@ -16,7 +16,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens , HasRoles;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -30,6 +30,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'image',
         'type',
         'password',
+        'email_verified_at'
     ];
 
     /**
@@ -43,7 +44,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'image',
     ];
 
-    protected $appends =[
+    protected $appends = [
         'image_url'
     ];
 
@@ -81,7 +82,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     // authourization filament and front
     public function canAccessFilament(): bool
     {
-        return in_array($this->type, ['admin','co-admin','seller']);
+        return in_array($this->type, ['admin', 'co-admin', 'seller']);
     }
 
     public function isAdmin(): bool
@@ -103,7 +104,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     //after implements the FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
-        return in_array($this->type, ['admin', 'seller' , 'co-admin']);
+        return in_array($this->type, ['admin', 'seller', 'co-admin']);
     }
 
 

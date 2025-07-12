@@ -50,45 +50,51 @@ class UserResource extends Resource
             Section::make('Role & Permissions')
                 ->columns(2)
                 ->schema([
+                    //column named role_id (in role table)
                     Select::make('role_id')
                         ->label('Role')
+                        //list the role table , take the id and name
                         ->options(fn() => Role::pluck('name', 'id'))
+                        //required only in create form
                         ->required(fn(string $context) => $context === 'create')
-                        // at first there are user ? => roles (relattion from HasRoles) first =>the first role ,
-                        // it may has many roles , and then take the id of this role
-                        ->default(fn( $record) => $record->roles()->first()->id)
-
-                        //if the value of this select change , then apply the next function
+                        //
+                        ->afterStateHydrated(function (Set $set, $state, $record) {
+                            if ($record && $record->roles()->exists()) {
+                                $set('role_id', $record->roles()->first()->id);
+                            }
+                        })
                         ->reactive()
-                        //means after the value change , do the function
-                        //state (new value(id)) ,and assign this new value with type (in user migration)
                         ->afterStateUpdated(function (?string $state, Set $set) {
                             $role = Role::find($state);
                             if ($role) {
                                 $set('type', $role->name);
-                                // Auto-select role's permissions for non-admin roles
+
                                 if ($role->name !== 'admin') {
                                     $set('permissions', $role->permissions->pluck('name')->toArray());
                                 } else {
-                                    $set('permissions', []); // Clear for admin
+                                    $set('permissions', []);
                                 }
                             }
                         })
-                        //this values will send when submit form
                         ->dehydrated()
                         ->live(),
 
                     CheckboxList::make('permissions')
                         ->label('Permissions')
+                        //we take name , name => cause deal with name and can display   and as avalue
                         ->options(fn() => Permission::pluck('name', 'name'))
-                        ->columns(2)
-                        ->default(fn(?Model $record) => $record?->getPermissionNames()->toArray() ?? [])
+                        ->columns(3)
+                        ->afterStateHydrated(function (Set $set, ?Model $record) {
+                            if ($record) {
+                                $set('permissions', $record->getAllPermissions()->pluck('name')->toArray());
+                            }
+                        })
                         ->visible(function (Get $get) {
                             $roleId = $get('role_id');
                             if (!$roleId) return false;
 
                             $role = Role::find($roleId);
-                            return $role && $role->name !== 'admin'; // Show for non-admin roles
+                            return $role && $role->name !== 'admin'; // Show only for non-admin
                         })
                         ->dehydrated(),
                 ]),
@@ -124,14 +130,14 @@ class UserResource extends Resource
                 TextColumn::make('name')->label('Full Name')->searchable(),
                 TextColumn::make('email')->label('Email'),
                 TextColumn::make('type')->label('Role')->badge()
-                ->color(function ($state) {
-                    return match ($state) {
-                        'admin' => 'danger',
-                        'co-admin'=>'primary',
-                        'seller' => 'info',
-                        'buyer' => 'success',
-                    };
-                }),
+                    ->color(function ($state) {
+                        return match ($state) {
+                            'admin' => 'danger',
+                            'co-admin' => 'primary',
+                            'seller' => 'info',
+                            'buyer' => 'success',
+                        };
+                    }),
                 ImageColumn::make('image')->label('Image')->circular(),
             ])
             ->filters([])
