@@ -9,7 +9,7 @@
 
 
 @section('content')
-@include('front.filter')
+    @include('front.filter')
     <div class="section section-properties">
         <div class="container">
             <div class="row mb-5 align-items-center">
@@ -30,12 +30,21 @@
                             <div class="position-absolute top-0 end-0 m-2 z-2">
                                 <span
                                     class="badge rounded-pill
-                @if ($estate->status == 'rented') bg-success
-                @elseif($estate->status == 'Sold') bg-danger
-                @else bg-secondary @endif text-white">
+            @if ($estate->status == 'rented') bg-success
+            @elseif($estate->status == 'Sold') bg-danger
+            @else bg-secondary @endif text-white">
                                     <i class="bi bi-tag-fill me-1"></i> {{ $estate->status }}
                                 </span>
+
+                                @if ($estate->status == 'rented')
+                                    <div class="mt-1 small text-white bg-dark p-1 rounded">
+                                        <i class="bi bi-clock me-1"></i>
+                                        Available after:
+                                        {{ $estate->reservations->last()->end_date}}
+                                    </div>
+                                @endif
                             </div>
+
 
                             <!-- Type Badge -->
                             <div class="position-absolute top-0 start-0 m-2 z-2">

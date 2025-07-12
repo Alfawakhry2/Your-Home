@@ -7,6 +7,8 @@ use App\Models\Reservation;
 use Illuminate\Http\Request;
 use App\Services\PaymobService;
 use App\Http\Controllers\Controller;
+use App\Services\VonageService;
+use Exception;
 
 class PaymentController extends Controller
 {
@@ -72,13 +74,17 @@ class PaymentController extends Controller
             return response()->json(['error' => 'Not found'], 404);
         }
 
+
         return response()->json(['message' => 'Processed'], 200);
     }
 
     // Redirect (as call back , but to client )
     ## redirect to the reservation page with message
-    public function response(Request $request)
+    public function response(Request $request, VonageService $sms)
     {
+
+
+
         $isSuccess = $request->query('success') == 'true' || $request->query('success') === true;
 
         //handlePaymentStatus is static function that defined in reservation model
@@ -98,6 +104,14 @@ class PaymentController extends Controller
                 ->with('error', 'Paied Failed , try in another Time ');
         }
 
+        //after payment Complete
+        try {
+
+            $sms->send("201155346186", "Reservation & Payment Completed , You Paid " . number_format($reservation->price,2) . " EGP");
+
+        } catch (Exception $e) {
+            \Log::error('Sms Not Sent' , $e->getMessage());
+        }
         return redirect()->route('reservation.index')
             ->with('success', 'Paied Successfully ');
     }

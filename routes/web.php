@@ -14,7 +14,6 @@ use App\Http\Controllers\front\ReservationController;
 use App\Http\Controllers\front\PaymentDetailsController;
 
 
-Auth::routes(['verify' => true]);
 
 // RedirectIfFilamentUser can allow to guest or buyer , and only admin , seller can not access to these page
 Route::middleware(RedirectIfFilamentUser::class)->group(function () {
@@ -46,7 +45,7 @@ Route::middleware([RedirectIfNotBuyer::class, 'auth', 'verified'])
             ->name('checkout.pay');
 
 
-            //will go to pay function , then return to
+        //will go to pay function , then return to
         Route::get('pay/{reservation}', [PaymentController::class, 'pay'])
             ->name('paymob.pay');
 
@@ -70,4 +69,12 @@ Route::middleware([RedirectIfNotBuyer::class, 'auth', 'verified'])
         // Payments
         // Route::get('/payments', [PaymentDetailsController::class, 'index'])->name('payments.index');
         Route::get('/payments/{id}', [PaymentDetailsController::class, 'show'])->name('payments.show');
+
+
+        //Notification after estate become available
+        Route::post('/estate/{estate}/notify-me', [EstateController::class, 'notifyMe'])->name('estate.notifyMe');
     });
+
+
+
+require __DIR__ . '/auth.php';

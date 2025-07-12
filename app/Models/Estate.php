@@ -60,6 +60,11 @@ class Estate extends Model
 
     public function reservations(){
         return $this->hasMany(Reservation::class);
+        // ->orderBy('end_date' , 'desc');
+    }
+
+    public function notifications(){
+        return $this->hasMany(EstateNotification::class);
     }
 
     // this used with api

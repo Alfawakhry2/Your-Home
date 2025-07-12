@@ -25,6 +25,11 @@
                         </div>
                         <div class="gallery-thumbnails mt-3">
                             <div class="row g-2">
+                                <div class="col-3 col-md-2">
+                                    <img src="{{ asset('storage/' . $estate->image) }}" class="img-thumbnail cursor-pointer"
+                                        style="height: 80px; object-fit: cover;"
+                                        onclick="document.getElementById('mainGalleryImage').src = this.src">
+                                </div>
                                 @foreach ($estate->images as $index => $image)
                                     <div class="col-3 col-md-2">
                                         <img src="{{ asset('storage/' . $image->image) }}"
@@ -44,7 +49,13 @@
                                 <h1 class="text-primary fw-bold mb-0">{{ $estate->title }}</h1>
                                 <span class="badge bg-success fs-6">{{ $estate->status }}</span>
                             </div>
-
+                            @if ($estate->status == 'rented')
+                                <div class="mt-1 text-white bg-dark p-1 rounded text-center">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Available after:
+                                    {{ $estate->reservations->last()->end_date ?? 'UnKnown Date' }}
+                                </div>
+                            @endif
                             <div class="d-flex align-items-center mb-4">
                                 <i class="bi bi-geo-alt-fill text-danger fs-5 me-2"></i>
                                 <span class="text-muted fs-5">{{ $estate->location }}</span>
@@ -83,15 +94,29 @@
                                 <h4 class="fw-bold mb-3">Description</h4>
                                 <p class="text-secondary lh-lg">{{ $estate->description }}</p>
                             </div>
-                            <form action="{{ route('cart.store') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="estate_id" value="{{ $estate->id }}">
-                                <div class="d-flex justify-content-center">
-                                    <button type="submit" class="btn btn-secondary w-50 py-2 fw-bold rounded-pill mb-5">
-                                        <i class="bi bi-star me-2"></i> Add To Interested List
-                                    </button>
-                                </div>
-                            </form>
+                            @if ($estate->status === 'rented')
+                                <form action="{{ route('estate.notifyMe', $estate->id) }}" method="POST">
+                                    @csrf
+                                    <div class="d-flex justify-content-center">
+                                        <button type="submit"
+                                            class="btn btn-secondary w-50 py-2 fw-bold rounded-pill mb-5">
+                                            <i class="bi bi-bill me-2"></i> Send Notification When Available
+                                        </button>
+                                    </div>
+                                </form>
+                            @else
+                                <form action="{{ route('cart.store') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="estate_id" value="{{ $estate->id }}">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="submit"
+                                            class="btn btn-secondary w-50 py-2 fw-bold rounded-pill mb-5">
+                                            <i class="bi bi-star me-2"></i> Add To Interested List
+                                        </button>
+                                    </div>
+                                </form>
+                            @endif
+
                             {{-- <div class="property-features mb-5">
                             <h4 class="fw-bold mb-3"></h4>
                             <div class="row">
@@ -199,10 +224,22 @@
                                     <span class="fw-bold fs-4">EGP {{ number_format($estate->price) }}</span>
                                 </div>
                             </div>
-                            <a href="{{ route('checkout.estate' , $estate->id) }}" class="btn btn-danger w-100 py-2 fw-bold rounded-pill">
-                                <i class="bi bi-credit-card me-2"></i>Reserve Estate Now
+                            @if ($estate->status === 'available')
+                                <a href="{{ route('checkout.estate', $estate->id) }}"
+                                    class="btn btn-danger w-100 py-2 fw-bold rounded-pill">
+                                    <i class="bi bi-credit-card me-2"></i>Reserve Estate Now
 
-                            </a>
+                                </a>
+                            @else
+                                <form action="{{ route('estate.notifyMe', $estate->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit"
+                                        class="btn btn-secondary w-100 py-2 fw-bold rounded-pill">
+                                        <i class="bi bi-bill-card me-2"></i>Send Notification When Available
+
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>

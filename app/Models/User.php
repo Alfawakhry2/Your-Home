@@ -73,6 +73,10 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return $this->hasMany(Reservation::class);
     }
 
+    public function estateNotifications()
+    {
+        return $this->hasMany(EstateNotification::class);
+    }
 
     // authourization filament and front
     public function canAccessFilament(): bool
