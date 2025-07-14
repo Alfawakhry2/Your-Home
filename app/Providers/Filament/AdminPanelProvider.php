@@ -45,8 +45,8 @@ class AdminPanelProvider extends PanelProvider
                 // 'warning' => Color::Orange,
             ])
             ->font('PT Sans')
-            ->favicon(asset('filament/home.jpg'))
-            ->brandLogo(asset('filament/home.jpg'))
+            ->favicon(asset('filament/logo.png'))
+            ->brandLogo(asset('filament/logo.png'))
             ->brandLogoHeight('4rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

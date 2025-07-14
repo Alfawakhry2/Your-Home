@@ -169,7 +169,7 @@ class UserResource extends Resource
                         ImageEntry::make('image')->label('Profile Image')
                             ->height(40)
                             ->circular()
-                            ->defaultImageUrl(asset('filament/default.png')),
+                            ->defaultImageUrl(asset('filament/default.jpg')),
                         TextEntry::make('name')->label('Full Name'),
                         TextEntry::make('email')->label('Email Address'),
                         TextEntry::make('type')->label('User Role')

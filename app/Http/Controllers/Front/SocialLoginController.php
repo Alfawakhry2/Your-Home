@@ -70,7 +70,6 @@ class SocialLoginController extends Controller
     public function handleFacebookCallback(Request $request)
     {
 
-        // لو رجع فيه خطأ من Facebook (زي المستخدم رفض)
         if ($request->has('error') || $request->has('error_code')) {
             return redirect('/login')->with('error', 'Error while login with Facebook.');
         }
@@ -103,6 +102,49 @@ class SocialLoginController extends Controller
             $user->assignRole('buyer');
         }
 
+
+        Auth::login($user);
+
+        return redirect()->route('home');
+    }
+
+
+    public function redirectToGithub()
+    {
+        return Socialite::driver('github')->redirect();
+    }
+
+public function handleGithubCallback(Request $request)
+    {
+        if ($request->has('error') || $request->has('error_code')) {
+            return redirect('/login')->with('error', 'Error while login with GitHub , try again or use another way.');
+        }
+
+        try {
+            $githubUser = Socialite::driver('github')->stateless()->user();
+        } catch (Exception $e) {
+            \Log::error('GitHub login error: ' . $e->getMessage());
+            return redirect('/login')->with('error', 'Error while login with GitHub , try again or use another way.');
+        }
+
+        $user = User::where('email', $githubUser->getEmail())->first();
+
+        if ($user) {
+            if (!$user->github_id) {
+                // and if we use update , create and save , not need to confirm the fillable
+                //we not use the fillable => cause we make a query builder( with direct sql) not need to view the fillable
+                $user->update(['github_id' => $githubUser->getId()]);
+            }
+        } else {
+            $user = User::create([
+                'name' => $githubUser->getName() ?? $githubUser->getNickname(),
+                'email' => $githubUser->getEmail(),
+                'github_id' => $githubUser->getId(),
+                'email_verified_at' => now(),
+                'password' => bcrypt(uniqid()),
+                'type'=>'buyer',
+            ]);
+        }
 
         Auth::login($user);
 

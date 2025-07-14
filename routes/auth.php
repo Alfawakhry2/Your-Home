@@ -17,3 +17,7 @@ Route::get('/auth/google/callback', [SocialLoginController::class, 'handleGoogle
 ##facebook
 Route::get('/auth/facebook/redirect', [SocialLoginController::class, 'redirectToFacebook'])->name('facebook.redirect');
 Route::get('/auth/facebook/callback', [SocialLoginController::class, 'handleFacebookCallback'])->name('facebook.callback');
+
+##github
+Route::get('/auth/github/redirect', [SocialLoginController::class, 'redirectToGithub'])->name('github.redirect');
+Route::get('/auth/github/callback', [SocialLoginController::class, 'handleGithubCallback'])->name('github.callback');
