@@ -37,8 +37,17 @@ class AdminPanelProvider extends PanelProvider
             ->passwordReset()
             // ->authGuard('filament')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Cyan,
+                // 'danger' => Color::Rose,
+                // 'gray' => Color::Gray,
+                // 'info' => Color::Blue,
+                // 'success' => Color::Emerald,
+                // 'warning' => Color::Orange,
             ])
+            ->font('PT Sans')
+            ->favicon(asset('filament/home.jpg'))
+            ->brandLogo(asset('filament/home.jpg'))
+            ->brandLogoHeight('4rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -51,7 +60,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
                 AdminAccessControl::class,
                 // EnsureEmailIsVerified::class
-            ]) ->middleware([
+            ])->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,

@@ -8,6 +8,8 @@ use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +22,10 @@ use Filament\Tables\Columns\ImageColumn;
 use Spatie\Permission\Models\Permission;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
 use App\Filament\Resources\UserResource\Pages;
+use Filament\Infolists\Components\Section as ComponentsSection;
 use App\Filament\Resources\UserResource\RelationManagers\EstatsRelationManager;
 
 class UserResource extends Resource
@@ -118,11 +123,14 @@ class UserResource extends Resource
                 ->image()
                 ->disk('public')
                 ->directory('users')
-                ->rules(['nullable', 'image', 'mimes:png,jpg,jpeg']),
+                ->preserveFilenames()
+                ->nullable()
+                ->rules(['nullable', 'image', 'mimes:png,jpg,jpeg'])
+                ->dehydrated(fn($state) => filled($state))
         ]);
     }
 
-    public static function table(Tables\Table $table): Tables\Table
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -142,11 +150,30 @@ class UserResource extends Resource
             ])
             ->filters([])
             ->actions([
+
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+            ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                ComponentsSection::make('Basic Info')
+                    ->schema([
+                        ImageEntry::make('image')->label('Profile Image')
+                            ->height(40)
+                            ->circular()
+                            ->defaultImageUrl(asset('filament/default.png')),
+                        TextEntry::make('name')->label('Full Name'),
+                        TextEntry::make('email')->label('Email Address'),
+                        TextEntry::make('type')->label('User Role')
+                    ])->columns(2)
             ]);
     }
 
@@ -162,7 +189,7 @@ class UserResource extends Resource
         return [
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'edit'   => Pages\EditUser::route('/{record}/edit'),
+            'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 
