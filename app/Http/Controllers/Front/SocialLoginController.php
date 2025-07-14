@@ -13,6 +13,7 @@ class SocialLoginController extends Controller
 {
     public function redirectToGoogle()
     {
+        //connection with provider
         return Socialite::driver('google')->redirect();
     }
 
@@ -20,6 +21,7 @@ class SocialLoginController extends Controller
     {
         try {
             // Get user data from Google (after click on google icon)
+            // 
             $googleUser = Socialite::driver('google')->stateless()->user();
 
             // Try to find user by google_id (if exist , this is already registered => direct login)

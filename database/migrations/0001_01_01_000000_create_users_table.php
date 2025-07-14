@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->unique()->nullable();
             $table->string('image')->nullable();
-            //converted to type 
-            $table->enum('role' , ['admin' , 'seller' , 'buyer'])->default('buyer');
+            //converted to type (this added recently ) => 'co-admin'
+            $table->enum('role' , ['admin' ,'co-admin','seller' , 'buyer'])->default('buyer');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
