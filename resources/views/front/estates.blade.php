@@ -36,7 +36,7 @@
                                     <i class="bi bi-tag-fill me-1"></i> {{ $estate->status }}
                                 </span>
 
-                                @if ($estate->status == 'rented')
+                                @if ($estate->status === 'rented')
                                     <div class="mt-1 small text-white bg-dark p-1 rounded">
                                         <i class="bi bi-clock me-1"></i>
                                         Available after:

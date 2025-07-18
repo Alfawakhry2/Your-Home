@@ -38,7 +38,7 @@ class PaymentController extends Controller
             'first_name'   => auth()->user()->name,
             'last_name'    => auth()->user()->last_name ?? ' User', // i do that , cause i not have the last name
             'email'        => auth()->user()->email,
-            'phone_number' => auth()->user()->phone ?? '',
+            'phone_number' => auth()->user()->phone ?? '0',
             //this billing data i don't have , cause it is reservation , not delivery , but this data mandatory
             'street'       => $reservation->estate->street ?? 'Unkown Street ',
             'building'     => $reservation->estate->building_number ?? 'unknown',
@@ -105,13 +105,13 @@ class PaymentController extends Controller
         }
 
         //after payment Complete
-        try {
+        // try {
 
-            $sms->send("201155346186", "Reservation & Payment Completed , You Paid " . number_format($reservation->price,2) . " EGP");
+        //     $sms->send("201155346186", "Reservation & Payment Completed , You Paid " . number_format($reservation->price,2) . " EGP");
 
-        } catch (Exception $e) {
-            \Log::error('Sms Not Sent' , $e->getMessage());
-        }
+        // } catch (Exception $e) {
+        //     \Log::error('Sms Not Sent' , $e->getMessage());
+        // }
         return redirect()->route('reservation.index')
             ->with('success', 'Paied Successfully ');
     }

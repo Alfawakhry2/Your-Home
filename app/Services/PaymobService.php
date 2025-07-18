@@ -121,7 +121,7 @@ class PaymobService
     {
         //sort the data , as payment sort
         ksort($data);
-        //build the query with data 
+        //build the query with data
         $queryString = http_build_query($data);
         $calculatedHmac = hash_hmac('sha512', $queryString, config('paymob.hmac_key'));
         return $hmac === $calculatedHmac;
