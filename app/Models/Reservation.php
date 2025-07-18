@@ -26,8 +26,7 @@ class Reservation extends Model
     public function estate()
     {
         return $this->belongsTo(Estate::class)
-        ->withDefault('-')
-        ;
+        ->withDefault('-');
     }
 
     //related to callback and response

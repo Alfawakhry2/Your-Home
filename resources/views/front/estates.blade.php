@@ -40,7 +40,7 @@
                                     <div class="mt-1 small text-white bg-dark p-1 rounded">
                                         <i class="bi bi-clock me-1"></i>
                                         Available after:
-                                        {{ $estate->reservations->last()->end_date}}
+                                        {{ $estate->reservations->last()->end_date ?? ''}}
                                     </div>
                                 @endif
                             </div>

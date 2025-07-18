@@ -59,8 +59,8 @@ class Estate extends Model
     }
 
     public function reservations(){
-        return $this->hasMany(Reservation::class);
-        // ->orderBy('end_date' , 'desc');
+        return $this->hasMany(Reservation::class)
+        ->orderBy('end_date' , 'desc');
     }
 
     public function notifications(){
